@@ -122,8 +122,8 @@ namespace runtime {
 		//#region 数学运算符
 		add(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
-				let va = thread.pop()
 				let vb = thread.pop()
+				let va = thread.pop()
 				let vc = va + vb
 				thread.push(vc)
 			}, "+", a, b]
@@ -131,8 +131,8 @@ namespace runtime {
 
 		sub(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
-				let va = thread.pop()
 				let vb = thread.pop()
+				let va = thread.pop()
 				let vc = va - vb
 				thread.push(vc)
 			}, "-", a, b]
@@ -140,8 +140,8 @@ namespace runtime {
 
 		mult(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
-				let va = thread.pop()
 				let vb = thread.pop()
+				let va = thread.pop()
 				let vc = va * vb
 				thread.push(vc)
 			}, "*", a, b]
@@ -149,8 +149,8 @@ namespace runtime {
 
 		div(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
-				let va = thread.pop()
 				let vb = thread.pop()
+				let va = thread.pop()
 				let vc = va / vb
 				thread.push(vc)
 			}, "/", a, b]

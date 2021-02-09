@@ -88,7 +88,8 @@ namespace runtime {
 		 * 弹出栈中的值
 		 */
 		pop(): TVarValue {
-			this.stack.pop()
+			let value = this.stack.pop()
+			return value
 		}
 
 		/**
@@ -129,6 +130,17 @@ namespace runtime {
 		 */
 		setExport(key: VarID, value: TVarValue) {
 			this.exports[key.name] = value
+		}
+
+		/**
+		 * 获取导出变量列表
+		 */
+		getExports(): Object {
+			let exps = Object.create(null)
+			for (let key in this.exports) {
+				exps[key] = this.exports[key]
+			}
+			return exps
 		}
 	}
 }

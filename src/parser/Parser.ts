@@ -80,8 +80,15 @@ namespace tseval {
 		 * @param call 
 		 */
 		let genLocalAssign = (call: (p: pgparser.MatchedResult) => void) => {
-			return sequence([sequence([Let_s, VarName.wf(call), $White,]),
-				Assign, $White, OpStatement])
+			let opResult: pgparser.MatchedResult
+			let fop = (p: pgparser.MatchedResult) => {
+				opResult = p
+			}
+			let fv2 = (p: pgparser.MatchedResult) => {
+				call(opResult)
+			}
+			return sequence([sequence([Let_s, VarName.wf(fop), $White,]),
+				Assign, $White, OpStatement]).sf(fv2)
 		}
 		/**局部声明并赋值表达式 */
 		let DeclareAndAssignLocalVarStatement = genLocalAssign(tr.declareAndAssignLocalVar)
