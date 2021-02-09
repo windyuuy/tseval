@@ -18,13 +18,7 @@ namespace tseval {
 		}
 	}
 
-	// autotest.addFunc(() => {
-	// 	let tseval = new TSEval()
-	// 	let result = tseval.compile("export let default=123+3245-34*34/5455")
-	// 	let insts = result.getInstructions()
-	// 	console.log(insts)
-	// })
-	autotest.addFunc(() => {
+	autotest.addFunc("summary", () => {
 		let tseval = new TSEval()
 		let result = tseval.execute<{ default: number }>(`
 export let default=123+3245-34*34/5455

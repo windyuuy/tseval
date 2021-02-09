@@ -2,7 +2,7 @@
 namespace easytest {
 	export class TAutoTest {
 		calls: Function[] = []
-		addFunc(call: Function) {
+		addFunc(tip: string, call: Function) {
 			this.calls.push(call)
 		}
 	}
