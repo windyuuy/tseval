@@ -47,7 +47,7 @@ namespace tseval {
 		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName]).wf(tr.indexVarMember))]).named("VarRefer")
 		/**表达式值 */
 		let Value = union([ConstNumber, VarRefer]).named("Value")
-		/**操作符表达式 */
+		//#region 操作符表达式
 		let OpStatementV2 = (() => {
 			let opResult: pgparser.MatchedResult
 			let fop = (p: pgparser.MatchedResult) => {
@@ -76,6 +76,7 @@ namespace tseval {
 		})();
 		/**操作符计算表达式 */
 		let OpStatement = repeat(union([OpStatementV2, OpStatementV1]))
+		//#endregion
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 
