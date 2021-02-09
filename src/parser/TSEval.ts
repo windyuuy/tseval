@@ -27,9 +27,18 @@ namespace tseval {
 		}
 	}
 
+	autotest.addFunc("compile docend", () => {
+		let tseval = new TSEval()
+
+		let statement = "123+32%%&\\n"
+		easytest.expect_exception(() => {
+			let result = tseval.evalline<{ default: number }>(statement)
+		})
+	})
+
 	autotest.addFunc("summary", () => {
 		let tseval = new TSEval()
-		let statement = "123+3245-34*34*99/5455%333"
+		let statement = "123+3245-34*34*99/5455"
 		let result = tseval.execute<{ default: number }>(`
 export let default= ${statement}
 `)
