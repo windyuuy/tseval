@@ -98,8 +98,9 @@ namespace tseval {
 		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement,])
 		/**会话块 */
 		let Chunk = sequence([Any.wf(tr.enterSession), Sentence, Any.wf(tr.leaveSession)])
+		let Document = sequence([$White, repeat(Chunk), $White])
 
-		export const parseRoot = Chunk
+		export const parseRoot = Document
 		/**
 		 * 默认解析器
 		 */

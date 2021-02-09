@@ -25,7 +25,13 @@ namespace easytest {
 				}
 			})
 
-			console.log(`run test result: [total: ${total}, ok: ${okCount}, failed: ${failedCount}]`)
+			let summary = "all passed"
+			if (failedCount != 0) {
+				summary = "partly failed"
+			}
+			console.log("==================================================")
+			console.log(`= run test result: <${summary}>[total: ${total}, ok: ${okCount}, failed: ${failedCount}]`)
+			console.log("==================================================")
 		}
 	}
 	export const AutoTestManager = new TAutoTestManager()

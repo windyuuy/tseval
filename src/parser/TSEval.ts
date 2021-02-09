@@ -26,7 +26,9 @@ namespace tseval {
 	// })
 	autotest.addFunc(() => {
 		let tseval = new TSEval()
-		let result = tseval.execute<{ default: number }>("export let default=123+3245-34*34/5455")
+		let result = tseval.execute<{ default: number }>(`
+export let default=123+3245-34*34/5455
+`)
 		assert(result.default == 3367.788084326306, "unmatch result")
 	})
 }
