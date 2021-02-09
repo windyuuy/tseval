@@ -1,5 +1,5 @@
 
-/// <reference path="./TTSTranslater.ts" />
+/// <reference path="./TSTranslater.ts" />
 
 namespace tseval {
 	const { exactly, sequence, union, repeat, wrap, not, docend, } = pgparser.MatcherFactory
