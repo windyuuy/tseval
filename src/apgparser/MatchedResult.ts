@@ -31,6 +31,21 @@ namespace pgparser {
 		times: number = 1
 
 		/**
+		 * 原因
+		 */
+		reason: string = ""
+
+		/**
+		 * 原始匹配目标
+		 */
+		rawTarget: any
+
+		/**
+		 * 失败的匹配器
+		 */
+		fallMatcher: IMatcher = null
+
+		/**
 		 * 子结果树
 		 */
 		// subResults: MatchedWord[]
@@ -56,6 +71,17 @@ namespace pgparser {
 			this.source = iter.source
 			return this
 		}
+
+		/**
+		 * 合并失败信息
+		 * @param source 
+		 */
+		mergeFailure(source: MatchedResult) {
+			this.reason = source.reason
+			this.rawTarget = source.rawTarget
+			this.fallMatcher = source.fallMatcher
+		}
+
 	}
 
 }

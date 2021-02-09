@@ -1,50 +1,33 @@
 
 namespace runtime {
-	/**
-	 * 变量ID
-	 */
-	export type VarID = string;
-	/**
-	 * 即时执行指令
-	 */
-	export type JITInstruction = [(session: RuntimeSession) => void, string, any?, any?]
-
+	export type LocalVarId = number
 	/**
 	 * 运行时动态会话
 	 */
 	export class RuntimeSession {
-
-		/**
-		 * 栈
-		 */
-		stack: any[] = []
-
-		pop(): any {
-
-		}
-
-		push(value: any): void {
-
-		}
-
 		/**
 		 * 局部变量
+		 * - 局部变量全部以ID存储
 		 */
-		locals: { [key: string]: any } = Object.create(null)
-		setVar(key: VarID, value: any): void {
+		locals: { [key: number]: any } = Object.create(null)
 
-		}
-
-		getVar(key: VarID): any {
-
+		/**
+		 * 设置局部变量值
+		 * @param key 
+		 * @param value 
+		 */
+		setLocalVar(key: VarID, value: any): void {
+			this.locals[key.id] = value
 		}
 
 		/**
-		 * 导出变量
+		 * 获取局部变量值
+		 * @param key 
 		 */
-		exports: { [key: string]: any } = Object.create(null)
-		setExport(key: VarID, value: any) {
-
+		getLocalVar(key: VarID): any {
+			let value = this.locals[key.id]
+			return value
 		}
+
 	}
 }

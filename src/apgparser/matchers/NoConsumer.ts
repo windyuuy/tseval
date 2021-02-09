@@ -6,7 +6,7 @@ namespace pgparser {
 	export class NotMatcher extends ConsumerBase {
 		protected subMatcher: ConsumerBase
 
-		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignal = null) {
+		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal
 			this.subMatcher = subMatcher
 			return this
@@ -16,7 +16,7 @@ namespace pgparser {
 			{
 				let result = this.subMatcher.match(iter);
 				if (result.isMatched) {
-					return FailedMatchResult(iter)
+					return FailedMatchResult(iter, result, this)
 				}
 			}
 

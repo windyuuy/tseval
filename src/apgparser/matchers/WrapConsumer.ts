@@ -6,17 +6,14 @@ namespace pgparser {
 	export class WrapMatcher extends ConsumerBase {
 		protected subMatcher: ConsumerBase
 
-		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignal = null) {
+		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal
 			this.subMatcher = subMatcher
 			return this
 		}
 
 		match(iter: IterContext) {
-			let result = this.subMatcher.match(iter);
-			if (result.isMatched) {
-
-			}
+			let result = this.subMatcher.test(iter);
 			return result;
 		}
 	}

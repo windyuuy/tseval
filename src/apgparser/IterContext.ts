@@ -72,5 +72,40 @@ namespace pgparser {
 			return [this.cursor, this.cursor + str.length]
 		}
 
+		/**
+		 * 匹配会话中缓存的匹配信号
+		 */
+		matchedSignals: MatchedSignal[] = []
+
+		/**
+		 * 添加信号
+		 * @param pulse 
+		 */
+		pushSignal(pulse: MatchedSignalPulse, result: MatchedResult) {
+			this.matchedSignals.push({
+				pulse,
+				p1: result,
+			})
+		}
+
+		/**
+		 * 合并模拟匹配中挂靠的信号
+		 * - 针对一对多的模拟情形, 需要创建上下文副本
+		 * @param iter 
+		 */
+		mergeSimulated(iter: IterContext) {
+			this.matchedSignals.push(...iter.matchedSignals)
+		}
+
+		/**
+		 * 遍历应用匹配信号
+		 */
+		applySignals() {
+			for (let signal of this.matchedSignals) {
+				let pulse = signal.pulse
+				pulse(signal.p1)
+			}
+		}
+
 	}
 }

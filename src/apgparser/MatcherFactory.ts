@@ -9,7 +9,7 @@ namespace pgparser {
 		 * 基本元素型
 		 * @param matchState 
 		 */
-		exactly(matchState: MatcherStatement, matchedSignal: MatchedSignal = null) {
+		exactly(matchState: MatcherStatement, matchedSignal: MatchedSignalPulse = null) {
 			return new ExactlyConsumer().init(matchState, matchedSignal)
 		}
 
@@ -17,7 +17,7 @@ namespace pgparser {
 		 * 串联型
 		 * @param subMatchers 
 		 */
-		sequence(subMatchers: ConsumerBase[], matchedSignal: MatchedSignal = null) {
+		sequence(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
 			return new SequenceMatcher().init(subMatchers, matchedSignal)
 		}
 
@@ -25,7 +25,7 @@ namespace pgparser {
 		 * 联合型
 		 * @param subMatchers 
 		 */
-		union(subMatchers: ConsumerBase[], matchedSignal: MatchedSignal = null) {
+		union(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
 			return new UnionMatcher().init(subMatchers, matchedSignal)
 		}
 
@@ -34,7 +34,7 @@ namespace pgparser {
 		 * @param subMatcher 
 		 * @param matchedSignal 
 		 */
-		repeat(subMatcher: ConsumerBase, matchedSignal: MatchedSignal = null) {
+		repeat(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new RepeatMatcher().init(subMatcher, matchedSignal)
 		}
 
@@ -43,7 +43,7 @@ namespace pgparser {
 		 * @param subMatcher 
 		 * @param matchedSignal 
 		 */
-		wrap(subMatcher: ConsumerBase, matchedSignal: MatchedSignal = null) {
+		wrap(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new WrapMatcher().init(subMatcher, matchedSignal)
 		}
 
@@ -52,7 +52,7 @@ namespace pgparser {
 		 * @param subMatcher 
 		 * @param matchedSignal 
 		 */
-		not(subMatcher: ConsumerBase, matchedSignal: MatchedSignal = null) {
+		not(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new NotMatcher().init(subMatcher, matchedSignal)
 		}
 	}

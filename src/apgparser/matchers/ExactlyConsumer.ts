@@ -14,7 +14,7 @@ namespace pgparser {
 		reg: RegExp;
 		matchFunc: MatcherFunc
 
-		init(matchState: MatcherStatement, matchedSignal: MatchedSignal = null) {
+		init(matchState: MatcherStatement, matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal;
 
 			if (typeof (matchState) == "string") {
@@ -32,11 +32,13 @@ namespace pgparser {
 		match(iter: IterContext) {
 			let result = new MatchedResult(iter);
 
-			if (this.word) {
+			if (this.word != null) {
 				let text = iter.slice(this.word.length)
 				if (text == this.word) {
 					result.isMatched = true
 					result.loc = iter.getLoc(text)
+				} else {
+					result.rawTarget = this.word
 				}
 			} else if (this.reg) {
 				let leftText = iter.leftText
@@ -44,12 +46,16 @@ namespace pgparser {
 				if (m && m.index == 0) {
 					result.isMatched = true
 					result.loc = iter.getLoc(m[0])
+				} else {
+					result.rawTarget = this.reg
 				}
 			} else if (this.matchFunc) {
 				let customeResult = this.matchFunc(iter)
 				if (customeResult.isMatched) {
 					result.isMatched = true
 					result.loc = [...customeResult.loc]
+				} else {
+					result.rawTarget = this.matchFunc
 				}
 			} else {
 				throw new Error("empty matcher content is invalid.")
