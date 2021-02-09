@@ -64,7 +64,7 @@ namespace runtime {
 		 */
 		protected checkLocalVar(a: VarID): void {
 			if (a.id == null) {
-				throw new Error("invalid local var may undefined.")
+				throw new pgparser.TSICompileError("invalid local var, may undefined.")
 			}
 		}
 

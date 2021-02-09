@@ -94,7 +94,7 @@ namespace runtime {
 			}
 
 			// TODO:可能需要检查局部变量未声明问题
-			// throw new Error(`undefined local var : ${a.name}`)
+			// throw new TSICompileError(`undefined local var : ${a.name}`)
 		}
 	}
 }

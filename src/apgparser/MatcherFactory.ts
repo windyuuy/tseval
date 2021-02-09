@@ -55,6 +55,10 @@ namespace pgparser {
 		not(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new NotMatcher().init(subMatcher, matchedSignal)
 		}
+
+		docend(matchedSignal: MatchedSignalPulse = null) {
+			return new DocEndConsumer().init(matchedSignal)
+		}
 	}
 
 	export const MatcherFactory = new TMatcherFactory()

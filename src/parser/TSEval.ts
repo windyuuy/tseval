@@ -12,7 +12,7 @@ namespace tseval {
 		execute<T extends Object>(content: string, env: Object = {}): T {
 			let compileResult = TSParser.compile(content)
 			if (!compileResult.result.isMatched) {
-				throw new Error("compile failed")
+				throw new pgparser.TSICompileError("compile failed")
 			}
 			let executer = new runtime.RuntimeExecuter()
 			let thread = executer.executeInstuctions(compileResult.instructions, env)
@@ -29,7 +29,7 @@ namespace tseval {
 
 	autotest.addFunc("summary", () => {
 		let tseval = new TSEval()
-		let statement = "123+3245-34*34*99/5455"
+		let statement = "123+3245-34*34*99/5455%333"
 		let result = tseval.execute<{ default: number }>(`
 export let default= ${statement}
 `)
@@ -39,7 +39,7 @@ export let default= ${statement}
 	autotest.addFunc("evalline", () => {
 		let tseval = new TSEval()
 
-		let statement = "123+3245-34*34*99/5455"
+		let statement = "123+3245-34*34*99/5455/55*32+45-34-3-6-5+34235345-234"
 		let result = tseval.evalline<{ default: number }>(statement)
 		assert(result.default == eval(statement), "unmatch result")
 	})

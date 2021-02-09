@@ -24,7 +24,7 @@ namespace pgparser {
 			} else if (typeof (matchState) == "function") {
 				this.matchFunc = matchState
 			} else {
-				throw new Error("state type not implemented.")
+				throw new TSICompileError("state type not implemented.")
 			}
 			return this
 		}
@@ -39,6 +39,8 @@ namespace pgparser {
 					result.loc = iter.getLoc(text)
 				} else {
 					result.rawTarget = this.word
+					result.loc = iter.getUnmatchedLoc()
+					result.fallMatcher = this
 				}
 			} else if (this.reg) {
 				let leftText = iter.leftText
@@ -48,6 +50,8 @@ namespace pgparser {
 					result.loc = iter.getLoc(m[0])
 				} else {
 					result.rawTarget = this.reg
+					result.loc = iter.getUnmatchedLoc()
+					result.fallMatcher = this
 				}
 			} else if (this.matchFunc) {
 				let customeResult = this.matchFunc(iter)
@@ -56,9 +60,11 @@ namespace pgparser {
 					result.loc = [...customeResult.loc]
 				} else {
 					result.rawTarget = this.matchFunc
+					result.loc = iter.getUnmatchedLoc()
+					result.fallMatcher = this
 				}
 			} else {
-				throw new Error("empty matcher content is invalid.")
+				throw new TSICompileError("empty matcher content is invalid.")
 			}
 
 			return result

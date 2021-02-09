@@ -62,6 +62,20 @@ namespace pgparser {
 			return this.source.slice(this.loc[0], this.loc[1])
 		}
 
+		/**
+		 * 剩余内容
+		 */
+		get leftText() {
+			return this.source.slice(this.loc[0])
+		}
+
+		/**
+		 * 捕获长度
+		 */
+		get matchedLength(): number {
+			return this.loc[1] - this.loc[0]
+		}
+
 		constructor(iter: IterContext) {
 			this.init(iter)
 		}

@@ -2,7 +2,7 @@
 /// <reference path="./TTSTranslater.ts" />
 
 namespace tseval {
-	const { exactly, sequence, union, repeat, wrap, not, } = pgparser.MatcherFactory
+	const { exactly, sequence, union, repeat, wrap, not, docend, } = pgparser.MatcherFactory
 	namespace parser {
 		function combine(a: Function, b: Function, c?: Function) {
 			return function (...args: any[]) {
@@ -21,6 +21,7 @@ namespace tseval {
 			}
 		}
 
+		let DocEnd = docend();
 		let Any = exactly("")
 		let OpV1 = exactly(/[\+\-]/)
 		let OpV2 = exactly(/[\*\/]/)
@@ -98,7 +99,8 @@ namespace tseval {
 		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement,])
 		/**会话块 */
 		let Chunk = sequence([Any.wf(tr.enterSession), Sentence, Any.wf(tr.leaveSession)])
-		let Document = sequence([$White, repeat(Chunk), $White])
+		/**文档 */
+		let Document = sequence([$White, repeat(Chunk), $White, DocEnd])
 
 		export const parseRoot = Document
 		/**

@@ -26,7 +26,7 @@ namespace pgparser {
 
 		merge(other: IterContext) {
 			if (this.source != other.source) {
-				throw new Error("unmatched source.")
+				throw new TSICompileError("unmatched source.")
 			}
 			this.cursor = other.cursor
 		}
@@ -70,6 +70,10 @@ namespace pgparser {
 		 */
 		getLoc(str: string): Number2 {
 			return [this.cursor, this.cursor + str.length]
+		}
+
+		getUnmatchedLoc(): Number2 {
+			return [this.cursor, this.cursor]
 		}
 
 		/**
