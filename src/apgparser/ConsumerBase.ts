@@ -8,7 +8,7 @@ namespace pgparser {
 		/**
 		 * 命名, 调试用信息
 		 */
-		protected name: string;
+		name: string;
 
 		/**
 		 * 需要消耗
@@ -110,7 +110,7 @@ namespace pgparser {
 		 */
 		handleConsume(iter: IterContext, result: MatchedResult) {
 			if (this.needConsume) {
-				iter.forward(result.consume);
+				iter.forward(result.consumeLen);
 			}
 		}
 

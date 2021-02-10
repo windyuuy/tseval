@@ -55,7 +55,7 @@ namespace runtime {
 			this.runtimeWaver.declareLocalVar(a)
 			return [function (thread: RuntimeThread) {
 				thread.setLocalVar(a, undefined)
-			}, "let", a, v]
+			}, "declarelocalvar", a, v]
 		}
 
 		/**
@@ -108,7 +108,7 @@ namespace runtime {
 		}
 
 		/**
-		 * 导出变量
+		 * 声明局部变量并标记为导出
 		 */
 		exportVar(a: VarID): JITInstruction {
 			// TODO: 转值导出为命名导出

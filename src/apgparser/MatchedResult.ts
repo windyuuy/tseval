@@ -10,13 +10,9 @@ namespace pgparser {
 		 */
 		source: Literals
 		/**
-		 * 消耗单位数(和捕获内容长度不同)
-		 */
-		get consume(): number {
-			return this.loc[1] - this.loc[0]
-		}
-		/**
 		 * 定位
+		 * - [0]: 捕获内容起首
+		 * - [1]: 捕获内容末位
 		 */
 		loc: Number2
 
@@ -66,7 +62,14 @@ namespace pgparser {
 		 * 剩余内容
 		 */
 		get leftText() {
-			return this.source.slice(this.loc[0])
+			return this.source.slice(this.loc[1])
+		}
+
+		/**
+		 * 消耗单位数(和捕获内容长度不同)
+		 */
+		get consumeLen(): number {
+			return this.loc[1] - this.loc[0]
 		}
 
 		/**

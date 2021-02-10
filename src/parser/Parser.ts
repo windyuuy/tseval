@@ -21,28 +21,28 @@ namespace tseval {
 			}
 		}
 
-		let DocEnd = docend();
-		let Any = exactly("")
-		let OpV1 = exactly(/[\+\-]/)
-		let OpV2 = exactly(/[\*\/]/)
-		let OpAll = union([OpV1, OpV2])
-		let White = exactly(/\s/)
-		let $White = exactly(/\s*/)
-		let Word = exactly(/[a-zA-Z_\$][0-9a-zA-Z_\$]*/)
+		let DocEnd = docend().named("DocEnd")
+		let Any = exactly("").named("Any")
+		let OpV1 = exactly(/[\+\-]/).named("OpV1")
+		let OpV2 = exactly(/[\*\/]/).named("OpV2")
+		let OpAll = union([OpV1, OpV2]).named("OpAll")
+		let White = exactly(/\s/).named("White")
+		let $White = exactly(/\s*/).named("$White")
+		let Word = exactly(/[a-zA-Z_\$][0-9a-zA-Z_\$]*/).named("Word")
 		/**变量名 */
-		let VarName = wrap(Word)
+		let VarName = wrap(Word).named("VarName")
 		/**常量声明 */
 		let ConstNumber = exactly(/[0-9\.]+/).wf(tr.pushConst).named("ConstNumber")
-		let Let = exactly("let")
-		let Let_s = sequence([Let, White])
-		let Export = exactly("export")
-		let Export_s = sequence([Export, White])
+		let Let = exactly("let").named("Let")
+		let Let_s = sequence([Let, White]).named("Let_s")
+		let Export = exactly("export").named("Export")
+		let Export_s = sequence([Export, White]).named("Export_s")
 		/**局部声明表达式 */
-		let DeclareLocalVarStatement = sequence([Let_s, VarName.wf(tr.declareLocalVar), $White,])
+		let DeclareLocalVarStatement = sequence([Let_s, VarName.wf(tr.declareLocalVar), $White,]).named("DeclareLocalVarStatement")
 		/**赋值操作符: = */
-		let Assign = sequence([exactly(/[\=]/), not(OpAll).unconsume()])
+		let Assign = sequence([exactly(/[\=]/), not(OpAll).unconsume()]).named("Assign")
 		/**成员索引 */
-		let MemberIndexer = exactly(".")
+		let MemberIndexer = exactly(".").named("MemberIndexer")
 		/**变量索引 */
 		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName]).wf(tr.indexVarMember))]).named("VarRefer")
 		/**表达式值 */
@@ -75,7 +75,7 @@ namespace tseval {
 			return matcher
 		})();
 		/**操作符计算表达式 */
-		let OpStatement = repeat(union([OpStatementV2, OpStatementV1]))
+		let OpStatement = repeat(union([OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
 		//#endregion
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
@@ -89,19 +89,24 @@ namespace tseval {
 			let fv2 = (p: pgparser.MatchedResult) => {
 				call(opResult)
 			}
+			// let $var = $opstatement | $value
 			return sequence([sequence([Let_s, VarName.wf(fop), $White,]),
-				Assign, $White, OpStatement]).sf(fv2)
+				Assign, $White, union([OpStatement, Value])]).sf(fv2)
 		}
 		/**局部声明并赋值表达式 */
-		let DeclareAndAssignLocalVarStatement = genLocalAssign(tr.declareAndAssignLocalVar)
+		let DeclareAndAssignLocalVarStatement = genLocalAssign(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
 		/**导出表达式 */
-		let ExportStatement = sequence([Export_s, genLocalAssign(tr.exportVar)])
+		let ExportStatement = sequence([Export_s, genLocalAssign(tr.exportVar)]).named("ExportStatement")
 		/**语句 */
-		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement,])
+		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement,]).named("Sentence")
 		/**会话块 */
-		let Chunk = sequence([Any.wf(tr.enterSession), Sentence, Any.wf(tr.leaveSession)])
+		let Chunk = sequence([
+			Any.wf(tr.enterSession),
+			repeat(sequence([$White, Sentence, White,])).timesMin(1).named("MutiSentence"),
+			Any.wf(tr.leaveSession)
+		]).named("Chunk")
 		/**文档 */
-		let Document = sequence([$White, repeat(Chunk), $White, DocEnd])
+		let Document = sequence([$White, repeat(Chunk), $White, DocEnd]).named("Document")
 
 		export const parseRoot = Document
 		/**

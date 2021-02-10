@@ -2,7 +2,7 @@
 namespace runtime {
 	export type ExecuteEnv = Object;
 
-	export class RuntimeExecuter {
+	export class ThreadExecuter {
 		/**
 		 * 执行线程指令
 		 * @param instruction 

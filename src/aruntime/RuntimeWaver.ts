@@ -74,6 +74,7 @@ namespace runtime {
 		declareLocalVar(a: VarID) {
 			let localId = this.genLocalId()
 			a.id = localId
+			a.sessionStackIndex = 0
 			this.activeSession[a.name] = a
 		}
 

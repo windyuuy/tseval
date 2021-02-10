@@ -124,7 +124,7 @@ namespace runtime {
 		 */
 		exports: { [key: string]: TVarValue } = Object.create(null)
 		/**
-		 * 标记导出变量
+		 * 标记导出变量名称
 		 * @param key 
 		 * @param value 
 		 */

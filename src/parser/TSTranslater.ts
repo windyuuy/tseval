@@ -133,7 +133,7 @@ namespace tseval {
 		}
 
 		/**
-		 * 转换数学运算操作符
+		 * 转换数学运算操作符	
 		 * @param p 
 		 */
 		convOperation(p: pgparser.MatchedResult) {

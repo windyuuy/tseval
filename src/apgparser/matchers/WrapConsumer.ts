@@ -9,6 +9,7 @@ namespace pgparser {
 		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal
 			this.subMatcher = subMatcher
+			this.name = subMatcher.name
 			return this
 		}
 
