@@ -58,7 +58,7 @@ namespace tseval {
 		assert(result.default == eval(statement), "unmatch result")
 	})
 
-	autotest.addFunc("test export local var", () => {
+	autotest.addFunc("test export calculated local var", () => {
 		let valueA = 23
 		let valueB = 45
 
