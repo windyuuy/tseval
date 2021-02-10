@@ -21,19 +21,33 @@ namespace tseval {
 			}
 		}
 
+		/**标记文档末尾 */
 		let DocEnd = docend().named("DocEnd")
 		let Any = exactly("").named("Any")
 		let OpV1 = exactly(/[\+\-]/).named("OpV1")
 		let OpV2 = exactly(/[\*\/]/).named("OpV2")
 		let OpAll = union([OpV1, OpV2]).named("OpAll")
+		/**空白符 */
 		let White = exactly(/\s/).named("White")
+		/**可空的空白符 */
 		let $White = exactly(/\s*/).named("$White")
+		/**分号 */
 		let Semicolon = exactly(";").named("Semicolon")
+		/**引号 */
+		let Quot = exactly("\"").named("Quot").named("Quot")
+		/**大引号开头 */
+		let BigQuotBegin = exactly("'<").named("BigQuotBegin")
+		/**大引号收尾 */
+		let BigQuotEnd = exactly(">'").named("BigQuotEnd")
 		let Word = exactly(/[a-zA-Z_\$][0-9a-zA-Z_\$]*/).named("Word")
 		/**变量名 */
 		let VarName = wrap(Word).named("VarName")
-		/**常量声明 */
-		let ConstNumber = exactly(/[0-9\.]+/).wf(tr.pushConst).named("ConstNumber")
+		/**常量数字声明 */
+		let ConstNumber = exactly(/[0-9\.]+/).wf(tr.pushConstNumber).named("ConstNumber")
+		/**常量字符串声明 */
+		let ConstShortString = exactly(/"[^"]*"/).wf(tr.pushConstString).named("ConstString")
+		let ConstLongString = sequence([BigQuotBegin, repeat(not(BigQuotEnd)).sf(tr.pushLongConstString), BigQuotEnd]).named("ConstLongString")
+		let ConstString = union([ConstShortString, ConstLongString])
 		let Let = exactly("let").named("Let")
 		let Let_s = sequence([Let, White]).named("Let_s")
 		let Export = exactly("export").named("Export")
@@ -47,7 +61,7 @@ namespace tseval {
 		/**变量索引 */
 		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName]).wf(tr.indexVarMember))]).named("VarRefer")
 		/**表达式值 */
-		let Value = union([ConstNumber, VarRefer]).named("Value")
+		let Value = union([ConstNumber, ConstString, VarRefer]).named("Value")
 		//#region 操作符表达式
 		let OpStatementV2 = (() => {
 			let opResult: pgparser.MatchedResult

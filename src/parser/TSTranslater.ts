@@ -59,8 +59,39 @@ namespace tseval {
 		 * @param p 
 		 * @param value 
 		 */
-		pushConst(p: pgparser.MatchedResult) {
+		pushConstNumber(p: pgparser.MatchedResult) {
 			let constValue = parseFloat(p.text)
+			let inst = this.runtimeCoder.pushConst({
+				name: `const_${p.text}`,
+				constValue: p.text,
+			}, constValue)
+			this.instructions.push(inst)
+		}
+
+		/**
+		 * 导入常量
+		 * @param p 
+		 * @param value 
+		 */
+		pushConstString(p: pgparser.MatchedResult) {
+			let constValue = JSON.parse(p.text)
+			let inst = this.runtimeCoder.pushConst({
+				name: `const_${p.text}`,
+				constValue: p.text,
+			}, constValue)
+			this.instructions.push(inst)
+		}
+
+		/**
+		 * 导入常量
+		 * @param p 
+		 * @param value 
+		 */
+		pushLongConstString(p: pgparser.MatchedResult) {
+			let constValue = p.text
+			constValue = constValue.replace(/\\'/g, "'")
+			constValue = '"' + constValue.replace(/"/g, '\\"') + '"'
+			constValue = JSON.parse(constValue)
 			let inst = this.runtimeCoder.pushConst({
 				name: `const_${p.text}`,
 				constValue: p.text,
