@@ -28,6 +28,7 @@ namespace tseval {
 		let OpAll = union([OpV1, OpV2]).named("OpAll")
 		let White = exactly(/\s/).named("White")
 		let $White = exactly(/\s*/).named("$White")
+		let Semicolon = exactly(";").named("Semicolon")
 		let Word = exactly(/[a-zA-Z_\$][0-9a-zA-Z_\$]*/).named("Word")
 		/**变量名 */
 		let VarName = wrap(Word).named("VarName")
@@ -102,7 +103,7 @@ namespace tseval {
 		/**会话块 */
 		let Chunk = sequence([
 			Any.wf(tr.enterSession),
-			repeat(sequence([$White, Sentence, White,])).timesMin(1).named("MutiSentence"),
+			repeat(sequence([$White, Sentence, union([White, Semicolon, DocEnd]),])).timesMin(1).named("MutiSentence"),
 			Any.wf(tr.leaveSession)
 		]).named("Chunk")
 		/**文档 */

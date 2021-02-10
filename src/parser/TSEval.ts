@@ -12,7 +12,7 @@ namespace tseval {
 		 * @param env 
 		 */
 		compile(statement: string, env: Object = {}): CompileResult {
-			return TSParser.compile(statement + "\n")
+			return TSParser.compile(statement)
 		}
 
 		/**
