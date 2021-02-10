@@ -53,31 +53,5 @@ namespace tseval {
 		}
 	}
 
-	// 	autotest.addFunc("compile docend", () => {
-	// 		let tseval = new TSEval()
-
-	// 		let statement = "123+32%%&\\n"
-	// 		easytest.expect_exception(() => {
-	// 			let result = tseval.evalline<{ default: number }>(statement)
-	// 		})
-	// 	})
-
-	// 	autotest.addFunc("summary", () => {
-	// 		let tseval = new TSEval()
-	// 		let statement = "123+3245-34*34*99/5455"
-	// 		let result = tseval.execute<{ default: number }>(`
-	// export let default= ${statement}
-	// `)
-	// 		assert(result.default == eval(statement), "unmatch result")
-	// 	})
-
-	// 	autotest.addFunc("evalline", () => {
-	// 		let tseval = new TSEval()
-
-	// 		let statement = "123+3245-34*34*99/5455/55*32+45-34-3-6-5+34235345-234"
-	// 		let result = tseval.evalline<{ default: number }>(statement)
-	// 		assert(result.default == eval(statement), "unmatch result")
-	// 	})
-
 }
 
