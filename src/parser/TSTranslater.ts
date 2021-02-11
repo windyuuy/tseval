@@ -27,6 +27,13 @@ namespace tseval {
 		}
 
 		/**
+		 * 复制运时构建状态
+		 */
+		cloneRuntimeWaver() {
+			return this.runtimeWaver.clone()
+		}
+
+		/**
 		 * 获取变量调试信息
 		 * @param p 
 		 * @param index 
@@ -105,6 +112,17 @@ namespace tseval {
 		 */
 		declareLocalVar(p: pgparser.MatchedResult) {
 			let inst = this.runtimeCoder.declareLocalVar({
+				name: p.text,
+			})
+			this.instructions.push(inst)
+		}
+
+		/**
+		 * 标记不可变局部变量
+		 * @param a 
+		 */
+		declareImmultableLocalVar(p: pgparser.MatchedResult) {
+			let inst = this.runtimeCoder.declareImmultableLocalVar({
 				name: p.text,
 			})
 			this.instructions.push(inst)

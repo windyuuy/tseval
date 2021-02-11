@@ -25,6 +25,7 @@ namespace tseval {
 			if (!compileResult.result.isMatched) {
 				throw new pgparser.TSICompileError("compile failed")
 			}
+			compileResult.checkRuntimeWaverError()
 			let threadExecuter = new runtime.ThreadExecuter()
 			let thread = threadExecuter.executeInstuctions(compileResult.instructions, env)
 			return thread

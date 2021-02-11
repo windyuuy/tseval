@@ -30,6 +30,16 @@ namespace runtime {
 		 * 供调试用的常量值信息
 		 */
 		constValue?: TVarValue
+
+		/**
+		 * 值是否已赋值
+		 */
+		isValueAssigned?: boolean
+
+		/**
+		 * 是否赋值后不可变
+		 */
+		isUnmultable?: boolean
 	}
 
 	/**

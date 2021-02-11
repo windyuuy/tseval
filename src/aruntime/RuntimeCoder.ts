@@ -59,6 +59,16 @@ namespace runtime {
 		}
 
 		/**
+		 * 标记不可变局部变量
+		 * @param a 
+		 */
+		declareImmultableLocalVar(a: VarID): JITInstruction {
+			this.runtimeWaver.declareImmultableLocalVar(a)
+			return [function (thread: RuntimeThread) {
+			}, "immultable", a]
+		}
+
+		/**
 		 * 检查是否获取到了有效的局部变量信息
 		 * @param a 
 		 */
@@ -74,8 +84,9 @@ namespace runtime {
 		 * @param v 
 		 */
 		assignLocalVar(a: VarID, v: VarID): JITInstruction {
-			this.runtimeWaver.seekLocalVar(a)
+			let rawA = this.runtimeWaver.seekLocalVar(a)
 			this.checkLocalVar(a)
+			this.runtimeWaver.assignLocalVar(rawA, a)
 			return [function (thread: RuntimeThread) {
 				let value = thread.pop()
 				thread.setLocalVar(a, value)

@@ -9,6 +9,10 @@ namespace tseval {
 		 */
 		instructions: runtime.RuntimeInstructions
 		/**
+		 * 运行构建时状态
+		 */
+		runtimeWaver: runtime.RuntimeWaver
+		/**
 		 * 文法解析结果
 		 */
 		result: pgparser.MatchedResult
@@ -18,6 +22,16 @@ namespace tseval {
 		 */
 		getInstructions() {
 			return this.instructions.instructions
+		}
+
+		/**
+		 * 检查运行时构建错误
+		 */
+		checkRuntimeWaverError() {
+			let err = this.runtimeWaver.getTopError()
+			if (err) {
+				throw err.throwable
+			}
 		}
 	}
 }

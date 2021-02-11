@@ -50,10 +50,14 @@ namespace tseval {
 		let ConstString = union([ConstShortString, ConstLongString])
 		let Let = exactly("let").named("Let")
 		let Let_s = sequence([Let, White]).named("Let_s")
+		let Const = exactly("const").sf(tr.declareImmultableLocalVar).named("const")
+		let Const_s = sequence([Const, White]).named("Const_s")
+		let LetDeclare = union([Let, Const]).named("LetDeclare")
+		let LetDeclare_s = sequence([LetDeclare, White]).named("LetDeclare_s")
 		let Export = exactly("export").named("Export")
 		let Export_s = sequence([Export, White]).named("Export_s")
 		/**局部声明表达式 */
-		let DeclareLocalVarStatement = sequence([Let_s, VarName.wf(tr.declareLocalVar), $White,]).named("DeclareLocalVarStatement")
+		let DeclareLocalVarStatement = sequence([LetDeclare_s, VarName.wf(tr.declareLocalVar), $White,]).named("DeclareLocalVarStatement")
 		/**赋值操作符: = */
 		let Assign = sequence([exactly(/[\=]/), not(OpAll).unconsume()]).named("Assign")
 		/**成员索引 */
@@ -92,11 +96,13 @@ namespace tseval {
 		/**操作符计算表达式 */
 		let OpStatement = repeat(union([OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
 		//#endregion
+		/**值表达式 */
+		let ValueStatement = union([OpStatement, Value]).named("ValueStatement")
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 
 		 */
-		let genLocalAssign = (call: (p: pgparser.MatchedResult) => void) => {
+		let genLocalDeclare = (call: (p: pgparser.MatchedResult) => void) => {
 			let opResult: pgparser.MatchedResult
 			let fop = (p: pgparser.MatchedResult) => {
 				opResult = p
@@ -105,15 +111,26 @@ namespace tseval {
 				call(opResult)
 			}
 			// let $var = $opstatement | $value
-			return sequence([sequence([Let_s, VarName.wf(fop), $White,]),
-				Assign, $White, union([OpStatement, Value])]).sf(fv2)
+			return sequence([sequence([LetDeclare_s, VarName.wf(fop), $White,]),
+				Assign, $White, ValueStatement]).wf(fv2)
 		}
 		/**局部声明并赋值表达式 */
-		let DeclareAndAssignLocalVarStatement = genLocalAssign(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
+		let DeclareAndAssignLocalVarStatement = genLocalDeclare(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
 		/**导出表达式 */
-		let ExportStatement = sequence([Export_s, genLocalAssign(tr.exportVar)]).named("ExportStatement")
+		let ExportStatement = sequence([Export_s, genLocalDeclare(tr.exportVar)]).named("ExportStatement")
+		/**变量赋值 */
+		let AssignVarStatement = (() => {
+			let opResult: pgparser.MatchedResult
+			let fop = (p: pgparser.MatchedResult) => {
+				opResult = p
+			}
+			let fv2 = (p: pgparser.MatchedResult) => {
+				tr.assignLocalVar(opResult)
+			}
+			return sequence([VarRefer.wf(fop), $White, Assign, $White, ValueStatement.wf(fv2)])
+		})();
 		/**语句 */
-		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement,]).named("Sentence")
+		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement, AssignVarStatement,]).named("Sentence")
 		/**会话块 */
 		let Chunk = sequence([
 			Any.wf(tr.enterSession),
@@ -141,6 +158,7 @@ namespace tseval {
 				let compileResult = new CompileResult()
 				compileResult.result = result
 				compileResult.instructions = translator.cloneInstructions()
+				compileResult.runtimeWaver = translator.cloneRuntimeWaver()
 				return compileResult
 			}
 

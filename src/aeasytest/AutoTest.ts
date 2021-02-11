@@ -20,7 +20,7 @@ namespace easytest {
 					okCount += 1
 				} catch (e) {
 					failedCount += 1
-					console.error("Test Failed:", e)
+					console.error("Test Failed:", e.name, ":", e.message, e)
 					console.error(e.stack)
 				}
 			})
