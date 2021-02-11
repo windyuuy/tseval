@@ -24,6 +24,10 @@ namespace tseval {
 		/**标记文档末尾 */
 		let DocEnd = docend().named("DocEnd")
 		let Any = exactly("").named("Any")
+		let BracketL = exactly("(").named("BracketL")
+		let BracketR = exactly(")").named("BracketR")
+		let BraceL = exactly("{").named("BraceL")
+		let BraceR = exactly("}").named("BraceR")
 		let OpV1 = exactly(/[\+\-]/).named("OpV1")
 		let OpV2 = exactly(/[\*\/\%]/).named("OpV2")
 		let OpV3 = exactly(/\*\*/).named("OpV3")
@@ -69,6 +73,8 @@ namespace tseval {
 		let ReferValue = union([ConstNumber, ConstString, VarRefer]).named("ReferValue")
 		/**值表达式 */
 		let ValueStatement = stand().named("ValueStatement")
+		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
+		let SimpleValue = stand().named("SimpleValue")
 		//#region 操作符表达式
 		let OpStatementV3 = (() => {
 			let opResult: pgparser.MatchedResult
@@ -78,7 +84,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = ReferValue
+			let SubValue = SimpleValue
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV3.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV3")
@@ -92,7 +98,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = union([OpStatementV3, ReferValue])
+			let SubValue = union([OpStatementV3, SimpleValue])
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV2.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV2")
@@ -106,7 +112,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = union([OpStatementV2, ReferValue])
+			let SubValue = union([OpStatementV2, SimpleValue])
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV1.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV1")
@@ -116,7 +122,9 @@ namespace tseval {
 		let OpStatement = repeat(union([OpStatementV3, OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
 		//#endregion
 		// 递归声明
-		ValueStatement.assign(union([OpStatement, ReferValue]))
+		ValueStatement.assign(union([OpStatement, ReferValue, CombinedValue,]))
+		// SimpleValue.assign(union([ReferValue, CombinedValue,]))
+		SimpleValue.assign((ValueStatement.raw as pgparser.UnionMatcher).clone().sub([OpStatement]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 

@@ -27,5 +27,43 @@ namespace pgparser {
 			}
 			return FailedMatchResult(iter, resultO, this)
 		}
+
+		/**
+		 * 复制
+		 */
+		copy(it: ConsumerBase): UnionMatcher {
+			this.needConsume = it.needConsume
+			this.matchedSignal = it.matchedSignal
+			this.name = it.name
+			if (it instanceof UnionMatcher) {
+				this.subMatchers = it.subMatchers.concat()
+			}
+			return this
+		}
+
+		/**
+		 * 复制
+		 */
+		clone(): UnionMatcher {
+			let clone = new UnionMatcher()
+			clone.copy(this)
+			return clone
+		}
+
+		/**
+		 * 求出差集
+		 * @param subMatchers 
+		 */
+		sub(subMatchers: ConsumerBase[]): UnionMatcher {
+			let selfSubMatchers = this.subMatchers
+			for (let i = selfSubMatchers.length - 1; i >= 0; i--) {
+				let matcher = selfSubMatchers[i]
+				if (subMatchers.indexOf(matcher) >= 0) {
+					selfSubMatchers.splice(i, 1)
+				}
+			}
+			return this
+		}
+
 	}
 }

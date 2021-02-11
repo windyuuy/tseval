@@ -27,6 +27,13 @@ namespace pgparser {
 		assign(subMatcher: ConsumerBase) {
 			this.subMatcher = subMatcher
 		}
+
+		/**
+		 * 获取原始匹配器
+		 */
+		get raw() {
+			return this.subMatcher
+		}
 	}
 
 }
