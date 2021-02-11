@@ -6,18 +6,22 @@ namespace easytest {
 			this.calls.push(call)
 			return this
 		}
-		protected testOnly = -1
+		protected testOnlys: number[] = []
 		/**
 		 * 只测试此项
 		 */
 		itOnly() {
-			this.testOnly = this.calls.length
+			this.testOnlys.push(this.calls.length - 1)
+			return this
 		}
 
+		/**
+		 * 获取所有待测试项
+		 */
 		getTests() {
 			let calls: Function[]
-			if (this.testOnly >= 0) {
-				calls = [this.calls[this.testOnly]]
+			if (this.testOnlys.length > 0) {
+				calls = this.testOnlys.map(index => this.calls[index])
 			} else {
 				calls = this.calls.concat()
 			}

@@ -46,11 +46,17 @@ namespace runtime {
 		 * 运行时构建错误列表
 		 */
 		protected runtimeWaverErrors: RuntimeWaverError[] = []
+		/**
+		 * 标记不可变量声明会话
+		 */
+		protected immultableBorder: boolean = false
 
 		init() {
 			this.sessions = Object.create(null)
 			this.sessionIdAcc = 1
 			this.sessionStack.length = 0
+			this.runtimeWaverErrors.length = 0
+			this.immultableBorder = false
 			this.localIdAcc = 1
 		}
 
@@ -80,7 +86,6 @@ namespace runtime {
 			this.sessionStack.shift()
 		}
 
-		protected immultableBorder: boolean = false
 		/**
 		 * 标记不可变变量
 		 * @param a 

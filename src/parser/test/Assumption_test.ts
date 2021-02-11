@@ -99,17 +99,21 @@ namespace tseval {
 	})
 
 	autotest.addFunc("test semicolon for sentence", () => {
-		let statement = `let aaa=234;let bbb=555*aaa;export let default=bbb;`
+		let valueA = 234
+		let valueB = 555
+		let statement = `let aaa=${valueA};let bbb=${valueB}*aaa;export let default=bbb;`
 		let tseval = new TSEval()
 		let result = tseval.execute<{ default: number }>(statement)
-		assert(result.default == 234 * 555, "unmatch result")
+		assert(result.default == valueA * valueB, "unmatch result")
 	})
 
 	autotest.addFunc("test docend for sentence end", () => {
-		let statement = `let aaa=234;let bbb=555*aaa;export let default=bbb`
+		let valueA = 234
+		let valueB = 555
+		let statement = `let aaa=${valueA};let bbb=${valueB}*aaa;export let default=bbb`
 		let tseval = new TSEval()
 		let result = tseval.execute<{ default: number }>(statement)
-		assert(result.default == 234 * 555, "unmatch result")
+		assert(result.default == valueA * valueB, "unmatch result")
 	})
 
 }

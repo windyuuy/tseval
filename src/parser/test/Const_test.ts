@@ -25,6 +25,6 @@ namespace tseval {
 			let result = tseval.execute<{ default: string }>(statement)
 			assert(result.default == "kljw", "unmatch result")
 		}, "", runtime.AssignUnmutableError)
-	}).itOnly()
+	})
 
 }
