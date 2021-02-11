@@ -43,7 +43,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		stand(matchedSignal: MatchedSignalPulse = null) {
-			return new WrapMatcher().init(null, matchedSignal)
+			return new WrapMatcher().init(CInvalid, matchedSignal)
 		}
 
 		/**
