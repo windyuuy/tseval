@@ -46,4 +46,14 @@ namespace tseval {
 		assert(result.default == ">'>\\'", "unmatch result")
 	})
 
+	autotest.addFunc("test string concat", () => {
+		let tseval = new TSEval()
+
+		let valueA = "\"AAA\""
+		let valueB = "\"BBB\""
+		let content = `let aaa=${valueA};let bbb=${valueB}; export let default=aaa+bbb;`
+		let result = tseval.execute<{ default: string }>(content)
+		assert(result.default == JSON.parse(valueA) + JSON.parse(valueB), "unmatch result")
+	})
+
 }
