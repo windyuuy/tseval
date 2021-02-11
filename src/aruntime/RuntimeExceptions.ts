@@ -10,10 +10,11 @@ namespace runtime {
 		}
 		readonly stack: string
 		get throwable(): Error {
-			let error = new Error(this.message)
-			error.stack = this.stack
-			error.name = this.name
-			return error
+			// let error = new Error(this.message)
+			// error.stack = this.stack
+			// error.name = this.name
+			// return error
+			return this
 		}
 	}
 	/**
