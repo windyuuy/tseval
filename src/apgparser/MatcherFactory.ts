@@ -39,6 +39,14 @@ namespace pgparser {
 		}
 
 		/**
+		 * 声明占位符号
+		 * @param matchedSignal 
+		 */
+		stand(matchedSignal: MatchedSignalPulse = null) {
+			return new WrapMatcher().init(null, matchedSignal)
+		}
+
+		/**
 		 * 包装复用
 		 * @param subMatcher 
 		 * @param matchedSignal 
@@ -54,6 +62,30 @@ namespace pgparser {
 		 */
 		not(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new NotMatcher().init(subMatcher, matchedSignal)
+		}
+
+		/**
+		 * 空匹配, 必定成功
+		 * @param matchedSignal 
+		 */
+		empty(matchedSignal: MatchedSignalPulse = null) {
+			return new EmptyConsumer().init(matchedSignal)
+		}
+
+		/**
+		 * 失败匹配, 必定失败
+		 * @param matchedSignal 
+		 */
+		fail(matchedSignal: MatchedSignalPulse = null) {
+			return new FailConsumer().init(matchedSignal)
+		}
+
+		/**
+		 * 无效匹配, 必定异常
+		 * @param matchedSignal 
+		 */
+		invalid(matchedSignal: MatchedSignalPulse = null) {
+			return new InvalidConsumer().init(matchedSignal)
 		}
 
 		docend(matchedSignal: MatchedSignalPulse = null) {

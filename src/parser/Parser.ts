@@ -2,7 +2,7 @@
 /// <reference path="./TSTranslater.ts" />
 
 namespace tseval {
-	const { exactly, sequence, union, repeat, wrap, not, docend, } = pgparser.MatcherFactory
+	const { exactly, sequence, union, repeat, wrap, not, docend, stand, } = pgparser.MatcherFactory
 	namespace parser {
 		function combine(a: Function, b: Function, c?: Function) {
 			return function (...args: any[]) {
@@ -66,7 +66,9 @@ namespace tseval {
 		/**变量索引 */
 		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName]).wf(tr.indexVarMember))]).named("VarRefer")
 		/**表达式值 */
-		let Value = union([ConstNumber, ConstString, VarRefer]).named("Value")
+		let ReferValue = union([ConstNumber, ConstString, VarRefer]).named("ReferValue")
+		/**值表达式 */
+		let ValueStatement = stand().named("ValueStatement")
 		//#region 操作符表达式
 		let OpStatementV3 = (() => {
 			let opResult: pgparser.MatchedResult
@@ -76,7 +78,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = Value
+			let SubValue = ReferValue
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV3.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV3")
@@ -90,7 +92,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = union([OpStatementV3, Value])
+			let SubValue = union([OpStatementV3, ReferValue])
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV2.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV2")
@@ -104,7 +106,7 @@ namespace tseval {
 			let fvalue = (p: pgparser.MatchedResult) => {
 				tr.convOperation(opResult)
 			}
-			let SubValue = union([OpStatementV2, Value])
+			let SubValue = union([OpStatementV2, ReferValue])
 			let matcher = sequence([SubValue,
 				repeat(sequence([$White, OpV1.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
 			]).named("OpStatementV1")
@@ -113,8 +115,8 @@ namespace tseval {
 		/**操作符计算表达式 */
 		let OpStatement = repeat(union([OpStatementV3, OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
 		//#endregion
-		/**值表达式 */
-		let ValueStatement = union([OpStatement, Value]).named("ValueStatement")
+		// 递归声明
+		ValueStatement.assign(union([OpStatement, ReferValue]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 

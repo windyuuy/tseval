@@ -28,6 +28,14 @@ namespace tseval {
 		assert(result.default == eval(statement), "unmatch result")
 	})
 
+	autotest.addFunc("evalline", () => {
+		let tseval = new TSEval()
+
+		let statement = "234+234*34**44+32*3%2"
+		let result = tseval.evalline<{ default: number }>(statement)
+		assert(result.default == eval(statement), "unmatch result")
+	})
+
 	autotest.addFunc("testlocal", () => {
 		let evalator = new TSEval()
 		let statement = "let aa=23"

@@ -47,13 +47,13 @@ namespace pgparser {
 			return wrap
 		}
 
-		clone(): ConsumerBase {
-			let clone = new ConsumerBase()
-			clone.needConsume = this.needConsume
-			clone.matchedSignal = this.matchedSignal
-			clone.name = this.name
-			return clone
-		}
+		// clone(): ConsumerBase {
+		// 	let clone = new ConsumerBase()
+		// 	clone.needConsume = this.needConsume
+		// 	clone.matchedSignal = this.matchedSignal
+		// 	clone.name = this.name
+		// 	return clone
+		// }
 
 		/**
 		 * 标记不消耗

@@ -10,7 +10,7 @@ namespace easytest {
 		/**
 		 * 只测试此项
 		 */
-		itOnly() {
+		only() {
 			this.testOnlys.push(this.calls.length - 1)
 			return this
 		}
@@ -60,7 +60,11 @@ namespace easytest {
 	export const AutoTestManager = new TAutoTestManager()
 
 	setTimeout(() => {
-		AutoTestManager.forEachTest(AutoTest)
+		try {
+			AutoTestManager.forEachTest(AutoTest)
+		} catch (e) {
+			console.error(e.name, "Error:", e.message, "\n", e.stack)
+		}
 	}, 0)
 
 	globalThis.easytest = easytest

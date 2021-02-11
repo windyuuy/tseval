@@ -8,14 +8,24 @@ namespace pgparser {
 
 		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal
-			this.subMatcher = subMatcher
-			this.name = subMatcher.name
+			if (subMatcher) {
+				this.subMatcher = subMatcher
+				this.name = subMatcher.name
+			}
 			return this
 		}
 
 		match(iter: IterContext) {
 			let result = this.subMatcher.test(iter);
 			return result;
+		}
+
+		/**
+		 * 分配实体
+		 * @param subMatcher 
+		 */
+		assign(subMatcher: ConsumerBase) {
+			this.subMatcher = subMatcher
 		}
 	}
 
