@@ -1,9 +1,27 @@
 
 namespace easytest {
 	export class TAutoTest {
-		calls: Function[] = []
+		protected calls: Function[] = []
 		addFunc(tip: string, call: Function) {
 			this.calls.push(call)
+			return this
+		}
+		protected testOnly = -1
+		/**
+		 * 只测试此项
+		 */
+		itOnly() {
+			this.testOnly = this.calls.length
+		}
+
+		getTests() {
+			let calls: Function[]
+			if (this.testOnly >= 0) {
+				calls = [this.calls[this.testOnly]]
+			} else {
+				calls = this.calls.concat()
+			}
+			return calls
 		}
 	}
 
@@ -11,10 +29,11 @@ namespace easytest {
 
 	export class TAutoTestManager {
 		forEachTest(tests: TAutoTest) {
-			let total = tests.calls.length
+			let calls = tests.getTests()
+			let total = calls.length
 			let okCount = 0
 			let failedCount = 0
-			tests.calls.forEach((f) => {
+			calls.forEach((f) => {
 				try {
 					f()
 					okCount += 1
