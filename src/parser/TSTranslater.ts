@@ -186,29 +186,49 @@ namespace tseval {
 		 * @param p 
 		 */
 		convOperation(p: pgparser.MatchedResult) {
+			let p1 = this.getVar(p, 0)
+			let p2 = this.getVar(p, 1)
 			switch (p.text) {
 				case "+": {
-					let inst = this.runtimeCoder.add(this.getVar(p, 0), this.getVar(p, 1))
+					let inst = this.runtimeCoder.add(p1, p2)
 					this.instructions.push(inst)
 					break;
 				}
 
 				case "-": {
-					let inst = this.runtimeCoder.sub(this.getVar(p, 0), this.getVar(p, 1))
+					let inst = this.runtimeCoder.sub(p1, p2)
 					this.instructions.push(inst)
 					break
 				}
 
 				case "*": {
-					let inst = this.runtimeCoder.mult(this.getVar(p, 0), this.getVar(p, 1))
+					let inst = this.runtimeCoder.mult(p1, p2)
 					this.instructions.push(inst)
 					break
 				}
 
 				case "/": {
-					let inst = this.runtimeCoder.div(this.getVar(p, 0), this.getVar(p, 1))
+					let inst = this.runtimeCoder.div(p1, p2)
 					this.instructions.push(inst)
 					break
+				}
+
+				case "%": {
+					let inst = this.runtimeCoder.mod(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "**": {
+					let inst = this.runtimeCoder.pow(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				default: {
+					this.runtimeWaver.pushError(new runtime.InvalidSymbolError().init({
+						name: p.text,
+					}))
 				}
 			}
 		}

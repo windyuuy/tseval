@@ -166,6 +166,25 @@ namespace runtime {
 				thread.push(vc)
 			}, "/", a, b]
 		}
+
+		mod(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va % vb
+				thread.push(vc)
+			}, "%", a, b]
+		}
+
+		pow(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va ** vb
+				thread.push(vc)
+			}, "**", a, b]
+		}
+
 		//#endregion
 
 	}

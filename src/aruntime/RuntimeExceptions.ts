@@ -47,4 +47,21 @@ namespace runtime {
 			return `var ${this.theVar.name} is immultable.`
 		}
 	}
+
+	/**
+	 * 无效符号
+	 */
+	export class InvalidSymbolError extends RuntimeWaverError {
+		name = "InvalidSymbolError"
+		theVar: VarID
+
+		init(v: VarID) {
+			this.theVar = v
+			return this
+		}
+
+		get message(): string {
+			return `var ${this.theVar.name} is invalid symbol.`
+		}
+	}
 }
