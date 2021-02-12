@@ -79,7 +79,8 @@ namespace runtime {
 		 */
 		protected checkLocalVar(a: VarID): void {
 			if (!this.isValidVarID(a)) {
-				throw new pgparser.TSICompileError(`invalid local var{${a.name}}, may undefined.`)
+				let error = new runtime.InvalidLocalVarError().init(a)
+				this.runtimeWaver.pushError(error)
 			}
 		}
 
@@ -176,9 +177,22 @@ namespace runtime {
 		/**
 		 * 声明局部变量并标记为导出
 		 */
-		exportVar(a: VarID): JITInstruction {
+		exportWithDeclareVar(a: VarID): JITInstruction {
 			// TODO: 转值导出为命名导出
 			this.runtimeWaver.declareLocalVar(a)
+			return [function (thread: RuntimeThread) {
+				let value = thread.pop()
+				thread.setExport(a, value)
+			}, "exportvar", a]
+		}
+
+		/**
+		 * 声明局部变量并标记为导出
+		 */
+		exportVar(a: VarID): JITInstruction {
+			// TODO: 转值导出为命名导出
+			this.runtimeWaver.seekLocalVar(a)
+			this.checkLocalVar(a)
 			return [function (thread: RuntimeThread) {
 				let value = thread.pop()
 				thread.setExport(a, value)

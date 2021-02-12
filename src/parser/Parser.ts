@@ -49,6 +49,10 @@ namespace tseval {
 		let $White = exactly(/\s*/).named("$White")
 		/**分号 */
 		let Semicolon = exactly(";").named("Semicolon")
+		/**行分隔符号 */
+		let LineSeperator = exactly(/\n/).named("LineSeperator")
+		/**语句分隔符 */
+		let SentenceSeperator = sequence([$White, union([Semicolon, LineSeperator, DocEnd,])]).named("SentenceSeperator")
 		/**引号 */
 		let Quot = exactly("\"").named("Quot").named("Quot")
 		/**大引号开头 */
@@ -131,23 +135,32 @@ namespace tseval {
 		}
 		/**局部声明并赋值表达式 */
 		let DeclareAndAssignLocalVarStatement = genLocalDeclare(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
+		/**导出声明表达式 */
+		let ExportAndDeclareStatement = sequence([Export_s, genLocalDeclare(tr.exportWithDeclareVar)]).named("ExportStatement")
 		/**导出表达式 */
-		let ExportStatement = sequence([Export_s, genLocalDeclare(tr.exportVar)]).named("ExportStatement")
+		let ExportStatement = sequence([Export_s, VarRefer.wf(tr.referVarAsValue).wf(tr.exportVar), wrap(SentenceSeperator).unconsume()]).named("ExportStatement")
 		/**变量赋值 */
 		let AssignVarStatement = (() => {
 			return sequence([VarRefer.wf(tr.assignLocalVar), $White, Assign, $White, ValueStatement])
 				.reverseSubSignals()
 		})();
 		/**语句 */
-		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement, AssignVarStatement,]).named("Sentence")
+		let Sentence = union([ExportAndDeclareStatement, ExportStatement, DeclareAndAssignLocalVarStatement, AssignVarStatement,]).named("Sentence")
 		/**会话块 */
-		let Chunk = sequence([
+		let Chunk = stand().named("Chunk")
+		Chunk.assign(sequence([
+			BraceL.wf(tr.enterSession),
+			repeat(sequence([$White, union([Chunk, Sentence]), union([DocEnd, Semicolon, $White,]),])).timesMin(1).named("MutiSentence"),
+			BraceR.wf(tr.leaveSession)
+		]))
+		/**文档级会话块 */
+		let DocChunk = sequence([
 			Any.wf(tr.enterSession),
-			repeat(sequence([$White, Sentence, union([White, Semicolon, DocEnd]),])).timesMin(1).named("MutiSentence"),
+			repeat(sequence([$White, union([Chunk, Sentence]), union([DocEnd, Semicolon, $White]),])).timesMin(1).named("MutiSentence"),
 			Any.wf(tr.leaveSession)
-		]).named("Chunk")
+		]).named("DocChunk")
 		/**文档 */
-		let Document = sequence([$White, repeat(Chunk), $White, DocEnd]).named("Document")
+		let Document = sequence([$White, repeat(DocChunk), $White, DocEnd]).named("Document")
 
 		export const parseRoot = Document
 		/**

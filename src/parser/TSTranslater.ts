@@ -189,6 +189,17 @@ namespace tseval {
 		}
 
 		/**
+		 * 标记导出同时声明的变量
+		 * @param p 
+		 */
+		exportWithDeclareVar(p: pgparser.MatchedResult) {
+			let inst = this.runtimeCoder.exportWithDeclareVar({
+				name: p.text,
+			})
+			this.instructions.push(inst)
+		}
+
+		/**
 		 * 标记导出变量
 		 * @param p 
 		 */

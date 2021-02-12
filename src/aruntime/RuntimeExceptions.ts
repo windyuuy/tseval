@@ -66,6 +66,23 @@ namespace runtime {
 	}
 
 	/**
+	 * 无效局部变量引用
+	 */
+	export class InvalidLocalVarError extends RuntimeWaverError {
+		name = "InvalidLocalVarError"
+		protected theVar: VarID
+
+		init(v: VarID) {
+			this.theVar = v
+			return this
+		}
+
+		get message(): string {
+			return `local var <${this.theVar.name}> undefined.`
+		}
+	}
+
+	/**
 	 * 重复声明的符号
 	 */
 	export class DuplicatedSymbolDeclaration extends RuntimeWaverError {
