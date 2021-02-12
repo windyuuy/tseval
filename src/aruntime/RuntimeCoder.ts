@@ -2,6 +2,9 @@
 namespace runtime {
 	let SNone = Symbol("None")
 
+	const SESSION_LOCALS = fsync.EmptyTable()
+	SESSION_LOCALS["SESSION_LOCALS"] = "SESSION_LOCALS"
+
 	/**
 	 * 即时指令构建
 	 */
@@ -55,6 +58,8 @@ namespace runtime {
 			this.runtimeWaver.declareLocalVar(a)
 			return [function (thread: RuntimeThread) {
 				thread.setLocalVar(a, undefined)
+				thread.push(undefined)
+				thread.push(SESSION_LOCALS)
 			}, "declarelocalvar", a, v]
 		}
 
@@ -88,8 +93,19 @@ namespace runtime {
 			this.checkLocalVar(a)
 			this.runtimeWaver.assignLocalVar(rawA, a)
 			return [function (thread: RuntimeThread) {
+				// 索引上下文出栈
+				let context = thread.pop()
+				// 弹出之前引用变量时自动入栈的变量值
+				thread.pop()
+
 				let value = thread.pop()
-				thread.setLocalVar(a, value)
+				if (context == SESSION_LOCALS) {
+					// 如果是局部变量赋值
+					thread.setLocalVar(a, value)
+				} else {
+					// 如果是成员变量赋值
+					context[a.name] = value
+				}
 			}, "setlocal", a, v]
 		}
 
@@ -102,7 +118,10 @@ namespace runtime {
 			this.checkLocalVar(a)
 			return [function (thread: RuntimeThread) {
 				let value = thread.getLocalVar(a)
+				// 值压栈
 				thread.push(value)
+				// 索引对象压栈
+				thread.push(SESSION_LOCALS)
 			}, "getLocal", a]
 		}
 
@@ -112,10 +131,24 @@ namespace runtime {
 		 */
 		indexVarMember(a: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
+				/**成员索引目标 */
+				thread.pop()
+				// 索引值出栈
 				let value = thread.pop()
 				let memberValue = value[a.name]
 				thread.push(memberValue)
+				// 索引对象压栈
+				thread.push(value)
 			}, "index"]
+		}
+
+		/**
+		 * 变量作为值引用
+		 */
+		referVarAsValue(a: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				thread.pop()
+			}, "referasvalue"]
 		}
 
 		/**

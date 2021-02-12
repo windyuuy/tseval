@@ -151,6 +151,16 @@ namespace tseval {
 		}
 
 		/**
+		 * 变量作为值引用
+		 */
+		referVarAsValue(p: pgparser.MatchedResult) {
+			let inst = this.runtimeCoder.referVarAsValue({
+				name: p.text,
+			})
+			this.instructions.push(inst)
+		}
+
+		/**
 		 * 为局部变量赋值
 		 * @param p 
 		 */

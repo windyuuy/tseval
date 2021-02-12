@@ -70,7 +70,7 @@ namespace tseval {
 		/**变量索引 */
 		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName]).wf(tr.indexVarMember))]).named("VarRefer")
 		/**表达式值 */
-		let ReferValue = union([ConstNumber, ConstString, VarRefer]).named("ReferValue")
+		let ReferValue = union([ConstNumber, ConstString, VarRefer.wf(tr.referVarAsValue)]).named("ReferValue")
 		/**值表达式 */
 		let ValueStatement = stand().named("ValueStatement")
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
