@@ -1,5 +1,5 @@
 /**
- * 测试常量和变量赋值/运算
+ * 测试块域引用
  */
 namespace tseval {
 	let assert = easytest.assert
