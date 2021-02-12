@@ -28,10 +28,21 @@ namespace tseval {
 		let BracketR = exactly(")").named("BracketR")
 		let BraceL = exactly("{").named("BraceL")
 		let BraceR = exactly("}").named("BraceR")
-		let OpV1 = exactly(/[\+\-]/).named("OpV1")
-		let OpV2 = exactly(/[\*\/\%]/).named("OpV2")
-		let OpV3 = exactly(/\*\*/).named("OpV3")
-		let OpAll = union([OpV1, OpV2]).named("OpAll")
+
+		/**
+		 * 操作符匹配列表
+		 * - 优先级从前往后依次升高
+		 */
+		const operatorLiterals = [
+			"(?:\\*\\*)",
+			"[\\*\\/\\%]",
+			"[\\+\\-]",
+		]
+		// let OpVz1 = exactly(/[\+\-]/).named("OpVz1")
+		// let OpVz2 = exactly(/[\*\/\%]/).named("OpVz2")
+		// let OpVz3 = exactly(/\*\*/).named("OpVz3")
+		// let OpAll = union([OpVz1, OpVz2]).named("OpAll")
+		let OpAll = exactly(new RegExp(operatorLiterals.join("|"))).named("OpAll")
 		/**空白符 */
 		let White = exactly(/\s/).named("White")
 		/**可空的空白符 */
@@ -76,29 +87,56 @@ namespace tseval {
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
 		let SimpleValue = stand().named("SimpleValue")
 		//#region 操作符表达式
-		let OpStatementV3 = (() => {
-			let SubValue = SimpleValue
-			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV3.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-			]).named("OpStatementV3")
-			return matcher
-		})();
-		let OpStatementV2 = (() => {
-			let SubValue = union([OpStatementV3, SimpleValue])
-			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-			]).named("OpStatementV2")
-			return matcher
-		})();
-		let OpStatementV1 = (() => {
-			let SubValue = union([OpStatementV2, SimpleValue])
-			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV1.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-			]).named("OpStatementV1")
-			return matcher
-		})();
+		/**
+		 * 优先级从前往后依次降低
+		 */
+		let operationStatements: pgparser.ConsumerBase[] = []
+		{
+			let lastOpStatement: pgparser.ConsumerBase = null
+			operatorLiterals.forEach((opReg, index) => {
+				let OpStatementVz2 = (() => {
+					let OpVz2 = exactly(new RegExp(opReg)).named(`OpV${index}`)
+					let SubValue: pgparser.ConsumerBase
+					if (lastOpStatement) {
+						SubValue = union([lastOpStatement, SimpleValue])
+					} else {
+						SubValue = SimpleValue
+					}
+					let matcher = sequence([SubValue,
+						repeat(
+							sequence([$White, OpVz2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()
+						).timesMin(1)
+					]).named(`OpStatementV${index}`)
+					return matcher
+				})();
+				operationStatements.push(OpStatementVz2)
+				lastOpStatement = OpStatementVz2
+			})
+		}
+		// let OpStatementVz3 = (() => {
+		// 	let SubValue = SimpleValue
+		// 	let matcher = sequence([SubValue,
+		// 		repeat(sequence([$White, OpVz3.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
+		// 	]).named("OpStatementV3")
+		// 	return matcher
+		// })();
+		// let OpStatementVz2 = (() => {
+		// 	let SubValue = union([OpStatementVz3, SimpleValue])
+		// 	let matcher = sequence([SubValue,
+		// 		repeat(sequence([$White, OpVz2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
+		// 	]).named("OpStatementV2")
+		// 	return matcher
+		// })();
+		// let OpStatementVz1 = (() => {
+		// 	let SubValue = union([OpStatementVz2, SimpleValue])
+		// 	let matcher = sequence([SubValue,
+		// 		repeat(sequence([$White, OpVz1.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
+		// 	]).named("OpStatementV1")
+		// 	return matcher
+		// })();
 		/**操作符计算表达式 */
-		let OpStatement = repeat(union([OpStatementV3, OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
+		// let OpStatement = repeat(union([OpStatementVz3, OpStatementVz2, OpStatementVz1])).timesMin(1).named("OpStatement")
+		let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
 		// 递归声明
 		ValueStatement.assign(union([CombinedValue, OpStatement, ReferValue,]))
