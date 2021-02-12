@@ -1,4 +1,7 @@
 
+/**
+ * 测试算术
+ */
 namespace tseval {
 	let assert = easytest.assert
 
@@ -131,6 +134,38 @@ namespace tseval {
 		let tseval = new TSEval()
 		let result = tseval.execute<{ default: number }>(content)
 		assert(result.default == eval(statement), "unmatch result")
-	})//.only()
+	})
+
+	autotest.addFunc("test duplicate declare symbol 1", () => {
+		easytest.expect_exception(() => {
+			let content = `let aaa=35;let aaa=665;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+		}, "", runtime.DuplicatedSymbolDeclaration)
+	})
+
+	autotest.addFunc("test duplicate declare symbol 2", () => {
+		easytest.expect_exception(() => {
+			let content = `let aaa=35;let bbb=665;let aaa=234;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+		}, "", runtime.DuplicatedSymbolDeclaration)
+	})
+
+	autotest.addFunc("test duplicate declare symbol 3", () => {
+		easytest.expect_exception(() => {
+			let content = `let aaa=35;let bbb=665;aaa=3225;let aaa=234;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+		}, "", runtime.DuplicatedSymbolDeclaration)
+	})
+
+	autotest.addFunc("test duplicate declare symbol 4", () => {
+		easytest.expect_exception(() => {
+			let content = `let aaa=35;let bbb=665;aaa=aaa+bbb;let aaa=234;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+		}, "", runtime.DuplicatedSymbolDeclaration)
+	})
 
 }

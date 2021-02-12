@@ -102,14 +102,19 @@ namespace runtime {
 		 * @param a 
 		 */
 		declareLocalVar(a: VarID) {
+			let ses = this.activeSession
+			if (ses.locals[a.name]) {
+				let error = new DuplicatedSymbolDeclaration().init(a)
+				this.pushError(error)
+			}
+
 			let localId = this.genLocalId()
 			a.id = localId
 			a.sessionStackIndex = 0
 			a.isValueAssigned = false
-			this.activeSession.locals[a.name] = a
+			ses.locals[a.name] = a
 
 			// 确定变量是否可变
-			let ses = this.activeSession
 			a.isUnmultable = this.immultableBorder
 
 			this.immultableBorder = false
@@ -151,9 +156,10 @@ namespace runtime {
 		assignLocalVar(rawA: VarID, a: VarID) {
 			if (rawA.isValueAssigned && rawA.isUnmultable) {
 				// 值不可变则无法赋值
-				let error = new AssignUnmutableError().init(rawA)
+				let error = new AssignImmutableError().init(rawA)
 				this.pushError(error)
 			}
+
 			rawA.isValueAssigned = true
 			a.isValueAssigned = true
 		}

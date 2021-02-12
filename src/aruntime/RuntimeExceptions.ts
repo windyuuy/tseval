@@ -34,9 +34,9 @@ namespace runtime {
 	/**
 	 * 对不可变量赋值错误
 	 */
-	export class AssignUnmutableError extends RuntimeWaverError {
-		name = "AssignUnmutableError"
-		theVar: VarID
+	export class AssignImmutableError extends RuntimeWaverError {
+		name = "AssignImmutableError"
+		protected theVar: VarID
 
 		init(v: VarID) {
 			this.theVar = v
@@ -53,7 +53,7 @@ namespace runtime {
 	 */
 	export class InvalidSymbolError extends RuntimeWaverError {
 		name = "InvalidSymbolError"
-		theVar: VarID
+		protected theVar: VarID
 
 		init(v: VarID) {
 			this.theVar = v
@@ -61,7 +61,24 @@ namespace runtime {
 		}
 
 		get message(): string {
-			return `var ${this.theVar.name} is invalid symbol.`
+			return `var <${this.theVar.name}> is invalid symbol.`
+		}
+	}
+
+	/**
+	 * 重复声明的符号
+	 */
+	export class DuplicatedSymbolDeclaration extends RuntimeWaverError {
+		name = "DuplicatedSymbolDeclaration"
+		protected theVar: VarID
+
+		init(v: VarID) {
+			this.theVar = v
+			return this
+		}
+
+		get message(): string {
+			return `duplicated declaration of symbol <${this.theVar.name}>.`
 		}
 	}
 }

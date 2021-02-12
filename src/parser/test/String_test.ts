@@ -1,4 +1,8 @@
 
+/**
+ * 测试字符串操作
+ */
+
 namespace tseval {
 	let assert = easytest.assert
 
