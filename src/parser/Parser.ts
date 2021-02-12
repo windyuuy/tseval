@@ -34,13 +34,14 @@ namespace tseval {
 		 * - 优先级从前往后依次升高
 		 */
 		const operatorLiterals = [
-			"(?:\\*\\*)",
-			"[\\*\\/\\%]",
-			"[\\+\\-]",
+			/(?:\*\*)/,
+			/[\*\/\%]/,
+			/[\+\-]/,
+			/(?:\=\=)/,
 		]
 
 		// 所有操作符
-		let OpAll = exactly(new RegExp(operatorLiterals.join("|"))).named("OpAll")
+		let OpAll = exactly(new RegExp(operatorLiterals.map(r => r.source).join("|"))).named("OpAll")
 		/**空白符 */
 		let White = exactly(/\s/).named("White")
 		/**可空的空白符 */
@@ -93,7 +94,7 @@ namespace tseval {
 			let lastOpStatement: pgparser.ConsumerBase = null
 			operatorLiterals.forEach((opReg, index) => {
 				let OpStatementVz2 = (() => {
-					let OpVz2 = exactly(new RegExp(opReg)).named(`OpV${index}`)
+					let OpVz2 = exactly(opReg).named(`OpV${index}`)
 					let SubValue: pgparser.ConsumerBase
 					if (lastOpStatement) {
 						SubValue = union([lastOpStatement, SimpleValue])
