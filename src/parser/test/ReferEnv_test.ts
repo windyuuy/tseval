@@ -36,5 +36,5 @@ namespace tseval {
 			},
 		})
 		assert(result.default == 34)
-	}).only()
+	})
 }
