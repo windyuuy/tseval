@@ -240,6 +240,39 @@ namespace runtime {
 			}, "**", a, b]
 		}
 
+		equal(p1: VarID, p2: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va == vb
+				thread.push(vc)
+			}, "", p1, p2]
+		}
+		notEqual(p1: VarID, p2: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va != vb
+				thread.push(vc)
+			}, "", p1, p2]
+		}
+		strictEqual(p1: VarID, p2: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va === vb
+				thread.push(vc)
+			}, "", p1, p2]
+		}
+		strictNotEqual(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va !== vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+
 		//#endregion
 
 	}

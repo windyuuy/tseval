@@ -243,6 +243,30 @@ namespace tseval {
 					break
 				}
 
+				case "==": {
+					let inst = this.runtimeCoder.equal(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "!=": {
+					let inst = this.runtimeCoder.notEqual(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "===": {
+					let inst = this.runtimeCoder.strictEqual(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "!==": {
+					let inst = this.runtimeCoder.strictNotEqual(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
 				default: {
 					this.runtimeWaver.pushError(new runtime.InvalidSymbolError().init({
 						name: p.text,

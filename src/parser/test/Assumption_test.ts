@@ -168,4 +168,58 @@ namespace tseval {
 		}, "", runtime.DuplicatedSymbolDeclaration)
 	})
 
+	autotest.addFunc("test a == b", () => {
+		{
+			let content = `let aaa=35;let bbb=35;export let default=aaa==bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == true, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=665;export let default=aaa==bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == false, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=35;export let default=aaa!=bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == false, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=665;export let default=aaa!=bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == true, "unmatch result")
+		}
+	})
+
+	autotest.addFunc("test a === b", () => {
+		{
+			let content = `let aaa=35;let bbb=35;export let default=aaa===bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == true, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=665;export let default=aaa===bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == false, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=35;export let default=aaa!==bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == false, "unmatch result")
+		}
+		{
+			let content = `let aaa=35;let bbb=665;export let default=aaa!==bbb;`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content)
+			assert(result.default == true, "unmatch result")
+		}
+	})
+
 }
