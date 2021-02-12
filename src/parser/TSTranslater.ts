@@ -34,6 +34,14 @@ namespace tseval {
 		}
 
 		/**
+		 * 导入局部环境
+		 * @param env 
+		 */
+		importLocalEnv(env: Object) {
+			this.runtimeWaver.importLocalEnv(env)
+		}
+
+		/**
 		 * 获取变量调试信息
 		 * @param p 
 		 * @param index 

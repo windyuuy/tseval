@@ -12,7 +12,7 @@ namespace tseval {
 		 * @param env 
 		 */
 		compile(statement: string, env: Object = {}): CompileResult {
-			return TSParser.compile(statement)
+			return TSParser.compile(statement, env)
 		}
 
 		/**
@@ -27,7 +27,7 @@ namespace tseval {
 			}
 			compileResult.checkRuntimeWaverError()
 			let threadExecuter = new runtime.ThreadExecuter()
-			let thread = threadExecuter.executeInstuctions(compileResult.instructions, env)
+			let thread = threadExecuter.executeInstuctions(compileResult.runtimeWaver, compileResult.instructions, env)
 			return thread
 		}
 

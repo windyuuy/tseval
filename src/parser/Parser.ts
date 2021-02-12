@@ -141,11 +141,12 @@ namespace tseval {
 			/**
 			 * 对表达式执行即时编译
 			 */
-			compile(content: string): CompileResult {
+			compile(content: string, env: Object): CompileResult {
 				translator.clear()
 				let iterContext = new pgparser.IterContext().init(content)
 				let result = parseRoot.consume(iterContext)
 				if (result.isMatched) {
+					translator.importLocalEnv(env)
 					iterContext.applySignals()
 				}
 				let compileResult = new CompileResult()

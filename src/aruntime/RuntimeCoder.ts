@@ -2,8 +2,8 @@
 namespace runtime {
 	let SNone = Symbol("None")
 
-	const SESSION_LOCALS = fsync.EmptyTable()
-	SESSION_LOCALS["SESSION_LOCALS"] = "SESSION_LOCALS"
+	const SESSION_LOCALS = { SESSION_LOCALS: "SESSION_LOCALS" }
+	const SESSION_ENV_LOCALS = { SESSION_ENV_LOCALS: "SESSION_ENV_LOCALS" }
 
 	/**
 	 * 即时指令构建
@@ -78,9 +78,17 @@ namespace runtime {
 		 * @param a 
 		 */
 		protected checkLocalVar(a: VarID): void {
-			if (a.id == null) {
+			if (!this.isValidVarID(a)) {
 				throw new pgparser.TSICompileError(`invalid local var{${a.name}}, may undefined.`)
 			}
+		}
+
+		/**
+		 * 检查是否有效局部变量信息
+		 * @param a 
+		 */
+		isValidVarID(a: VarID): boolean {
+			return a.id != null
 		}
 
 		/**
@@ -102,6 +110,9 @@ namespace runtime {
 				if (context == SESSION_LOCALS) {
 					// 如果是局部变量赋值
 					thread.setLocalVar(a, value)
+				} else if (context == SESSION_ENV_LOCALS) {
+					// 如果是环境变量赋值
+					throw new Error("env local is immutable")
 				} else {
 					// 如果是成员变量赋值
 					context[a.name] = value
@@ -115,14 +126,25 @@ namespace runtime {
 		 */
 		getLocalVar(a: VarID): JITInstruction {
 			this.runtimeWaver.seekLocalVar(a)
-			this.checkLocalVar(a)
-			return [function (thread: RuntimeThread) {
-				let value = thread.getLocalVar(a)
-				// 值压栈
-				thread.push(value)
-				// 索引对象压栈
-				thread.push(SESSION_LOCALS)
-			}, "getLocal", a]
+			if (this.isValidVarID(a)) {
+				return [function (thread: RuntimeThread) {
+					let value = thread.getLocalVar(a)
+					// 值压栈
+					thread.push(value)
+					// 索引对象压栈
+					thread.push(SESSION_LOCALS)
+				}, "getLocal", a]
+			} else {
+				this.runtimeWaver.seekEnvVar(a)
+				this.checkLocalVar(a)
+				return [function (thread: RuntimeThread) {
+					let value = thread.getLocalEnvVar(a)
+					// 值压栈
+					thread.push(value)
+					// 索引对象压栈
+					thread.push(SESSION_ENV_LOCALS)
+				}, "getLocal", a]
+			}
 		}
 
 		/**

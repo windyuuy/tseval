@@ -39,7 +39,18 @@ namespace runtime {
 		/**
 		 * 是否赋值后不可变
 		 */
-		isUnmultable?: boolean
+		isImmultable?: boolean
+	}
+
+	/**
+	 * 复制变量定义信息
+	 * @param a 
+	 * @param info 
+	 */
+	export function copyVarIDInfo(a: VarID, info: VarID) {
+		a.id = info.id
+		a.isImmultable = info.isImmultable
+		a.isValueAssigned = info.isValueAssigned
 	}
 
 	/**
@@ -151,6 +162,28 @@ namespace runtime {
 				exps[key] = this.exports[key]
 			}
 			return exps
+		}
+
+		protected localEnvSession: RuntimeSession = new RuntimeSession()
+		/**
+		 * 导入环境变量
+		 * @param sessionWaver 
+		 * @param env 
+		 */
+		importLocalEnv(sessionWaver: SessionWaver, env: Object) {
+			let ses = this.localEnvSession
+			for (let key of Object.keys(sessionWaver.locals)) {
+				let a = sessionWaver.locals[key]
+				ses.setLocalVar(a, env[key])
+			}
+		}
+		/**
+		 * 获取环境变量值
+		 * @param key 
+		 */
+		getLocalEnvVar(key: VarID): TVarValue {
+			let value = this.localEnvSession.getLocalVar(key)
+			return value
 		}
 	}
 }

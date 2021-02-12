@@ -8,11 +8,15 @@ namespace runtime {
 	export class SessionWaver {
 		/**
 		 * 不可变变量
+		 * - key: 变量名
+		 * - value: 变量定义信息
 		 */
 		immultables: { [key: string]: VarID } = fsync.EmptyTable()
 
 		/**
 		 * 局部变量
+		 * - key: 变量名
+		 * - value: 变量定义信息
 		 */
 		locals: { [key: string]: VarID } = fsync.EmptyTable()
 	}
@@ -58,6 +62,7 @@ namespace runtime {
 			this.runtimeWaverErrors.length = 0
 			this.immultableBorder = false
 			this.localIdAcc = 1
+			this.localEnvSession = new SessionWaver()
 		}
 
 		/**
@@ -91,7 +96,7 @@ namespace runtime {
 		 * @param a 
 		 */
 		declareImmultableLocalVar(a: VarID) {
-			a.isUnmultable = true
+			a.isImmultable = true
 			// let ses = this.activeSession
 			// ses.immultables[a.name] = a
 			this.immultableBorder = true
@@ -115,7 +120,7 @@ namespace runtime {
 			ses.locals[a.name] = a
 
 			// 确定变量是否可变
-			a.isUnmultable = this.immultableBorder
+			a.isImmultable = this.immultableBorder
 
 			this.immultableBorder = false
 		}
@@ -145,6 +150,7 @@ namespace runtime {
 		clone() {
 			let runtimeWaver = new RuntimeWaver()
 			runtimeWaver.runtimeWaverErrors = this.runtimeWaverErrors.concat()
+			runtimeWaver.localEnvSession = this.localEnvSession
 			return runtimeWaver
 		}
 
@@ -154,7 +160,7 @@ namespace runtime {
 		 * @param a 外部引用的变量
 		 */
 		assignLocalVar(rawA: VarID, a: VarID) {
-			if (rawA.isValueAssigned && rawA.isUnmultable) {
+			if (rawA.isValueAssigned && rawA.isImmultable) {
 				// 值不可变则无法赋值
 				let error = new AssignImmutableError().init(rawA)
 				this.pushError(error)
@@ -175,16 +181,62 @@ namespace runtime {
 				// let ses = this.sessions[sesid]
 				if (ses.locals[a.name]) {
 					let info = ses.locals[a.name]
-					a.id = info.id
+					// a.id = info.id
+					// a.sessionStackIndex = i
+					// a.isUnmultable = info.isUnmultable
+					// a.isValueAssigned = info.isValueAssigned
+					copyVarIDInfo(a, info)
 					a.sessionStackIndex = i
-					a.isUnmultable = info.isUnmultable
-					a.isValueAssigned = info.isValueAssigned
 					return info
 				}
 			}
 
 			// TODO:可能需要检查局部变量未声明问题
 			// throw new TSICompileError(`undefined local var : ${a.name}`)
+		}
+
+		/**
+		 * 局部运行环境
+		 */
+		localEnvSession: SessionWaver = new SessionWaver()
+		seekEnvVar(a: VarID): VarID {
+			let info = this.localEnvSession.locals[a.name]
+			if (info !== undefined) {
+				// a.id = info.id
+				// a.isImmultable = true
+				// a.isValueAssigned = true
+				copyVarIDInfo(a, info)
+				return info
+			}
+		}
+
+		/**
+		 * 导入环境变量
+		 * @param env 
+		 */
+		importLocalEnv(env: Object) {
+			for (let key of Object.keys(env)) {
+				let a = new VarID()
+				a.name = key
+				// 初始环境变量若存在, 则都视为已赋值
+				a.isValueAssigned = true
+				// 初始环境变量不可修改
+				a.isImmultable = true
+				a.sessionStackIndex = -1
+				a.id = this.genLocalId()
+				a.constValue = env[key]
+				a.expression = `env[${key}]`
+				this.localEnvSession.locals[a.name] = a
+			}
+		}
+
+		/**
+		 * 创建指定规格的线程
+		 */
+		createRuntimeThread(env: Object) {
+			let thread = new RuntimeThread()
+			thread.importLocalEnv(this.localEnvSession, env)
+			return thread
 		}
 	}
 }
