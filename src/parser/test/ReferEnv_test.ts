@@ -16,7 +16,7 @@ namespace tseval {
 	})
 
 	autotest.addFunc("test refer env variable 2", () => {
-		let valueA = 23
+		let valueA = 2335
 		let tseval = new TSEval()
 		let statement = `let aaa=kkk;let bbb=kkk;let ccc=aaa*bbb*kkk;export let default=ccc;`
 		let result = tseval.execute<{ default: number }>(statement, {

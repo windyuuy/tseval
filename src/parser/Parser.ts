@@ -150,7 +150,7 @@ namespace tseval {
 					iterContext.applySignals()
 				}
 				let compileResult = new CompileResult()
-				compileResult.result = result
+				compileResult.parseResult = result
 				compileResult.instructions = translator.cloneInstructions()
 				compileResult.runtimeWaver = translator.cloneRuntimeWaver()
 				return compileResult

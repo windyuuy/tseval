@@ -15,7 +15,7 @@ namespace tseval {
 		/**
 		 * 文法解析结果
 		 */
-		result: pgparser.MatchedResult
+		parseResult: pgparser.MatchedResult
 
 		/**
 		 * 获取运行时指令
