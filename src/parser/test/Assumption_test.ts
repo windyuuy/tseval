@@ -124,4 +124,13 @@ namespace tseval {
 		assert(result.default == valueA * valueB, "unmatch result")
 	})
 
+	autotest.addFunc("test bracket in calcstatement", () => {
+		// let statement = "2+3*(4+5/(6-7*(9-1)))"
+		let statement = "4*(2/(3-7*(9-1)))"
+		let content = `export let default=${statement}`
+		let tseval = new TSEval()
+		let result = tseval.execute<{ default: number }>(content)
+		assert(result.default == eval(statement), "unmatch result")
+	})//.only()
+
 }

@@ -77,44 +77,44 @@ namespace tseval {
 		let SimpleValue = stand().named("SimpleValue")
 		//#region 操作符表达式
 		let OpStatementV3 = (() => {
-			let opResult: pgparser.MatchedResult
-			let fop = (p: pgparser.MatchedResult) => {
-				opResult = p
-			}
-			let fvalue = (p: pgparser.MatchedResult) => {
-				tr.convOperation(opResult)
-			}
+			// let opResult: pgparser.MatchedResult
+			// let fop = (p: pgparser.MatchedResult) => {
+			// 	opResult = p
+			// }
+			// let fvalue = (p: pgparser.MatchedResult) => {
+			// 	tr.convOperation(opResult)
+			// }
 			let SubValue = SimpleValue
 			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV3.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
+				repeat(sequence([$White, OpV3.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
 			]).named("OpStatementV3")
 			return matcher
 		})();
 		let OpStatementV2 = (() => {
-			let opResult: pgparser.MatchedResult
-			let fop = (p: pgparser.MatchedResult) => {
-				opResult = p
-			}
-			let fvalue = (p: pgparser.MatchedResult) => {
-				tr.convOperation(opResult)
-			}
+			// let opResult: pgparser.MatchedResult
+			// let fop = (p: pgparser.MatchedResult) => {
+			// 	opResult = p
+			// }
+			// let fvalue = (p: pgparser.MatchedResult) => {
+			// 	tr.convOperation(opResult)
+			// }
 			let SubValue = union([OpStatementV3, SimpleValue])
 			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV2.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
+				repeat(sequence([$White, OpV2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
 			]).named("OpStatementV2")
 			return matcher
 		})();
 		let OpStatementV1 = (() => {
-			let opResult: pgparser.MatchedResult
-			let fop = (p: pgparser.MatchedResult) => {
-				opResult = p
-			}
-			let fvalue = (p: pgparser.MatchedResult) => {
-				tr.convOperation(opResult)
-			}
+			// let opResult: pgparser.MatchedResult
+			// let fop = (p: pgparser.MatchedResult) => {
+			// 	opResult = p
+			// }
+			// let fvalue = (p: pgparser.MatchedResult) => {
+			// 	tr.convOperation(opResult)
+			// }
 			let SubValue = union([OpStatementV2, SimpleValue])
 			let matcher = sequence([SubValue,
-				repeat(sequence([$White, OpV1.wf(fop), $White, SubValue.wf(fvalue)])).timesMin(1)
+				repeat(sequence([$White, OpV1.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
 			]).named("OpStatementV1")
 			return matcher
 		})();
@@ -122,7 +122,7 @@ namespace tseval {
 		let OpStatement = repeat(union([OpStatementV3, OpStatementV2, OpStatementV1])).timesMin(1).named("OpStatement")
 		//#endregion
 		// 递归声明
-		ValueStatement.assign(union([OpStatement, ReferValue, CombinedValue,]))
+		ValueStatement.assign(union([CombinedValue, OpStatement, ReferValue,]))
 		// SimpleValue.assign(union([ReferValue, CombinedValue,]))
 		SimpleValue.assign((ValueStatement.raw as pgparser.UnionMatcher).clone().sub([OpStatement]))
 		/**
@@ -130,16 +130,16 @@ namespace tseval {
 		 * @param call 
 		 */
 		let genLocalDeclare = (call: (p: pgparser.MatchedResult) => void) => {
-			let opResult: pgparser.MatchedResult
-			let fop = (p: pgparser.MatchedResult) => {
-				opResult = p
-			}
-			let fvalue = (p: pgparser.MatchedResult) => {
-				call(opResult)
-			}
+			// let opResult: pgparser.MatchedResult
+			// let fop = (p: pgparser.MatchedResult) => {
+			// 	opResult = p
+			// }
+			// let fvalue = (p: pgparser.MatchedResult) => {
+			// 	call(opResult)
+			// }
 			// let $var = $opstatement | $value
-			return sequence([sequence([LetDeclare_s, VarName.wf(fop), $White,]),
-				Assign, $White, ValueStatement]).wf(fvalue)
+			return sequence([sequence([LetDeclare_s, VarName.wf(call), $White,]),
+				Assign, $White, ValueStatement]).reverseSubSignals()
 		}
 		/**局部声明并赋值表达式 */
 		let DeclareAndAssignLocalVarStatement = genLocalDeclare(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
@@ -147,14 +147,15 @@ namespace tseval {
 		let ExportStatement = sequence([Export_s, genLocalDeclare(tr.exportVar)]).named("ExportStatement")
 		/**变量赋值 */
 		let AssignVarStatement = (() => {
-			let opResult: pgparser.MatchedResult
-			let fop = (p: pgparser.MatchedResult) => {
-				opResult = p
-			}
-			let fvalue = (p: pgparser.MatchedResult) => {
-				tr.assignLocalVar(opResult)
-			}
-			return sequence([VarRefer.wf(fop), $White, Assign, $White, ValueStatement.wf(fvalue)])
+			// let opResult: pgparser.MatchedResult
+			// let fop = (p: pgparser.MatchedResult) => {
+			// 	opResult = p
+			// }
+			// let fvalue = (p: pgparser.MatchedResult) => {
+			// 	tr.assignLocalVar(opResult)
+			// }
+			return sequence([VarRefer.wf(tr.assignLocalVar), $White, Assign, $White, ValueStatement])
+				.reverseSubSignals()
 		})();
 		/**语句 */
 		let Sentence = union([ExportStatement, DeclareAndAssignLocalVarStatement, AssignVarStatement,]).named("Sentence")

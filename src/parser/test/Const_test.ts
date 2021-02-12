@@ -16,7 +16,7 @@ namespace tseval {
 		let statement = `let aaa="";aaa="kljw";export let default=aaa;`
 		let result = tseval.execute<{ default: string }>(statement)
 		assert(result.default == "kljw", "unmatch result")
-	})
+	}).only()
 
 	autotest.addFunc("test immultable var assign", () => {
 		easytest.expect_exception(() => {
