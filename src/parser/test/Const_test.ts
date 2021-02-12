@@ -27,4 +27,15 @@ namespace tseval {
 		}, "", runtime.AssignUnmutableError)
 	})
 
+	autotest.addFunc("test multi immultable var assign", () => {
+		easytest.expect_exception(() => {
+			let tseval = new TSEval()
+			let statement = `let ccc="";const aaa="";let bbb="42";aaa="kljw";bbb="23";bbb=aaa;bbb=ccc;ccc=aaa;ccc=bbb;export let AAA=aaa;export let BBB=bbb;export let CCC=ccc;`
+			let result = tseval.execute<{ AAA: string, BBB: string, CCC: string, }>(statement)
+			assert(result.AAA == "kljw", "unmatch result")
+			assert(result.BBB == "", "unmatch result")
+			assert(result.CCC == "", "unmatch result")
+		}, "", runtime.AssignUnmutableError)
+	})
+
 }
