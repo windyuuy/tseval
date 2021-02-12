@@ -116,7 +116,7 @@ namespace tseval {
 		//#endregion
 		// 递归声明
 		ValueStatement.assign(union([CombinedValue, OpStatement, ReferValue,]))
-		// SimpleValue.assign(union([ReferValue, CombinedValue,]))
+		// 需要从中剔除操作符表达式, 避免无限递归
 		SimpleValue.assign((ValueStatement.raw as pgparser.UnionMatcher).clone().sub([OpStatement]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
