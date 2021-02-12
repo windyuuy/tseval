@@ -38,10 +38,8 @@ namespace tseval {
 			"[\\*\\/\\%]",
 			"[\\+\\-]",
 		]
-		// let OpVz1 = exactly(/[\+\-]/).named("OpVz1")
-		// let OpVz2 = exactly(/[\*\/\%]/).named("OpVz2")
-		// let OpVz3 = exactly(/\*\*/).named("OpVz3")
-		// let OpAll = union([OpVz1, OpVz2]).named("OpAll")
+
+		// 所有操作符
 		let OpAll = exactly(new RegExp(operatorLiterals.join("|"))).named("OpAll")
 		/**空白符 */
 		let White = exactly(/\s/).named("White")
@@ -113,29 +111,7 @@ namespace tseval {
 				lastOpStatement = OpStatementVz2
 			})
 		}
-		// let OpStatementVz3 = (() => {
-		// 	let SubValue = SimpleValue
-		// 	let matcher = sequence([SubValue,
-		// 		repeat(sequence([$White, OpVz3.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-		// 	]).named("OpStatementV3")
-		// 	return matcher
-		// })();
-		// let OpStatementVz2 = (() => {
-		// 	let SubValue = union([OpStatementVz3, SimpleValue])
-		// 	let matcher = sequence([SubValue,
-		// 		repeat(sequence([$White, OpVz2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-		// 	]).named("OpStatementV2")
-		// 	return matcher
-		// })();
-		// let OpStatementVz1 = (() => {
-		// 	let SubValue = union([OpStatementVz2, SimpleValue])
-		// 	let matcher = sequence([SubValue,
-		// 		repeat(sequence([$White, OpVz1.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()).timesMin(1)
-		// 	]).named("OpStatementV1")
-		// 	return matcher
-		// })();
 		/**操作符计算表达式 */
-		// let OpStatement = repeat(union([OpStatementVz3, OpStatementVz2, OpStatementVz1])).timesMin(1).named("OpStatement")
 		let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
 		// 递归声明
