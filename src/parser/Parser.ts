@@ -86,7 +86,7 @@ namespace tseval {
 		let SimpleValue = stand().named("SimpleValue")
 		//#region 操作符表达式
 		/**
-		 * 优先级从前往后依次降低
+		 * 优先级从前往后依次升高
 		 */
 		let operationStatements: pgparser.ConsumerBase[] = []
 		{
