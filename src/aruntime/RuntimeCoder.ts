@@ -99,6 +99,7 @@ namespace runtime {
 		 */
 		assignLocalVar(a: VarID, v: VarID): JITInstruction {
 			if (this.runtimeWaver.isGoonIndexMember) {
+				this.runtimeWaver.isGoonIndexMember = false
 				return [function (thread: RuntimeThread) {
 					// 索引上下文出栈
 					let address = thread.pop() as VarID
