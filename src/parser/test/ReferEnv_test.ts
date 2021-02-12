@@ -25,4 +25,16 @@ namespace tseval {
 		assert(result.default == valueA * valueA * valueA, "unmatch result")
 	})
 
+	autotest.addFunc("test refer var member", () => {
+		let evalator = new TSEval()
+		let statement = `export let default=kkk.aaa.bbb`
+		let result = evalator.execute<{ default: number }>(statement, {
+			kkk: {
+				aaa: {
+					bbb: 34,
+				},
+			},
+		})
+		assert(result.default == 34)
+	}).only()
 }

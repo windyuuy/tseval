@@ -31,4 +31,5 @@ namespace tseval {
 		assert(thread.sessions["1"].locals[1] == 23)
 		assert(thread.sessions["1"].locals[2] == 23)
 	})
+
 }
