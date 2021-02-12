@@ -37,4 +37,18 @@ namespace tseval {
 		})
 		assert(result.default == 34)
 	})
+
+	autotest.addFunc("test set var member", () => {
+		let evalator = new TSEval()
+		let statement = `kkk.aaa.bbb=235;export let default=kkk.aaa.bbb`
+		let result = evalator.execute<{ default: number }>(statement, {
+			kkk: {
+				aaa: {
+					bbb: 34,
+				},
+			},
+		})
+		assert(result.default == 235)
+	})
+
 }

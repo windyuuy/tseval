@@ -55,6 +55,11 @@ namespace runtime {
 		 */
 		protected immultableBorder: boolean = false
 
+		/**
+		 * 是否正在索引成员
+		 */
+		isGoonIndexMember: boolean = false
+
 		init() {
 			this.sessions = Object.create(null)
 			this.sessionIdAcc = 1
@@ -63,6 +68,23 @@ namespace runtime {
 			this.immultableBorder = false
 			this.localIdAcc = 1
 			this.localEnvSession = new SessionWaver()
+			this.isGoonIndexMember = false
+		}
+
+		/**
+		 * 复制运行时构建状态
+		 */
+		clone() {
+			let runtimeWaver = new RuntimeWaver()
+			runtimeWaver.sessions = this.sessions
+			runtimeWaver.sessionIdAcc = this.sessionIdAcc
+			runtimeWaver.sessionStack = this.sessionStack.concat()
+			runtimeWaver.runtimeWaverErrors = this.runtimeWaverErrors.concat()
+			runtimeWaver.immultableBorder = this.immultableBorder
+			runtimeWaver.localIdAcc = this.localIdAcc
+			runtimeWaver.localEnvSession = this.localEnvSession
+			runtimeWaver.isGoonIndexMember = this.isGoonIndexMember
+			return runtimeWaver
 		}
 
 		/**
@@ -117,6 +139,7 @@ namespace runtime {
 			a.id = localId
 			a.sessionStackIndex = 0
 			a.isValueAssigned = false
+			a.indexSource = SESSION_LOCALS
 			ses.locals[a.name] = a
 
 			// 确定变量是否可变
@@ -142,16 +165,6 @@ namespace runtime {
 		 */
 		getTopError() {
 			return this.runtimeWaverErrors[0]
-		}
-
-		/**
-		 * 复制运行时构建状态
-		 */
-		clone() {
-			let runtimeWaver = new RuntimeWaver()
-			runtimeWaver.runtimeWaverErrors = this.runtimeWaverErrors.concat()
-			runtimeWaver.localEnvSession = this.localEnvSession
-			return runtimeWaver
 		}
 
 		/**
@@ -226,6 +239,7 @@ namespace runtime {
 				a.id = this.genLocalId()
 				a.constValue = env[key]
 				a.expression = `env[${key}]`
+				a.indexSource = SESSION_ENV_LOCALS
 				this.localEnvSession.locals[a.name] = a
 			}
 		}

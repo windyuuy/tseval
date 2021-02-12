@@ -40,6 +40,11 @@ namespace runtime {
 		 * 是否赋值后不可变
 		 */
 		isImmultable?: boolean
+
+		/**
+		 * 寄宿的索引源
+		 */
+		indexSource?: Object
 	}
 
 	/**
@@ -51,6 +56,7 @@ namespace runtime {
 		a.id = info.id
 		a.isImmultable = info.isImmultable
 		a.isValueAssigned = info.isValueAssigned
+		a.indexSource = info.indexSource
 	}
 
 	/**

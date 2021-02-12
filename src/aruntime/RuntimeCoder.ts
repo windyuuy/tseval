@@ -1,9 +1,9 @@
 
 namespace runtime {
-	let SNone = Symbol("None")
+	export let SNone = Symbol("None")
 
-	const SESSION_LOCALS = { SESSION_LOCALS: "SESSION_LOCALS" }
-	const SESSION_ENV_LOCALS = { SESSION_ENV_LOCALS: "SESSION_ENV_LOCALS" }
+	export const SESSION_LOCALS = { SESSION_LOCALS: "SESSION_LOCALS" }
+	export const SESSION_ENV_LOCALS = { SESSION_ENV_LOCALS: "SESSION_ENV_LOCALS" }
 
 	/**
 	 * 即时指令构建
@@ -59,7 +59,7 @@ namespace runtime {
 			return [function (thread: RuntimeThread) {
 				thread.setLocalVar(a, undefined)
 				thread.push(undefined)
-				thread.push(SESSION_LOCALS)
+				thread.push(a)
 			}, "declarelocalvar", a, v]
 		}
 
@@ -98,27 +98,50 @@ namespace runtime {
 		 * @param v 
 		 */
 		assignLocalVar(a: VarID, v: VarID): JITInstruction {
-			let rawA = this.runtimeWaver.seekLocalVar(a)
-			this.checkLocalVar(a)
-			this.runtimeWaver.assignLocalVar(rawA, a)
-			return [function (thread: RuntimeThread) {
-				// 索引上下文出栈
-				let context = thread.pop()
-				// 弹出之前引用变量时自动入栈的变量值
-				thread.pop()
+			if (this.runtimeWaver.isGoonIndexMember) {
+				return [function (thread: RuntimeThread) {
+					// 索引上下文出栈
+					let address = thread.pop() as VarID
+					let context = address.indexSource
+					// 弹出之前引用变量时自动入栈的变量值
+					thread.pop()
 
-				let value = thread.pop()
-				if (context == SESSION_LOCALS) {
-					// 如果是局部变量赋值
-					thread.setLocalVar(a, value)
-				} else if (context == SESSION_ENV_LOCALS) {
-					// 如果是环境变量赋值
-					throw new Error("env local is immutable")
-				} else {
-					// 如果是成员变量赋值
-					context[a.name] = value
-				}
-			}, "setlocal", a, v]
+					let value = thread.pop()
+					if (context == SESSION_LOCALS) {
+						// 如果是局部变量赋值
+						throw new Error("invalid member host")
+					} else if (context == SESSION_ENV_LOCALS) {
+						// 如果是环境变量赋值
+						throw new Error("invalid member host")
+					} else {
+						// 如果是成员变量赋值
+						context[address.name] = value
+					}
+				}, "setmember", a, v]
+			} else {
+				let rawA = this.runtimeWaver.seekLocalVar(a)
+				this.checkLocalVar(a)
+				this.runtimeWaver.assignLocalVar(rawA, a)
+				return [function (thread: RuntimeThread) {
+					// 索引上下文出栈
+					let address = thread.pop() as VarID
+					let context = address.indexSource
+					// 弹出之前引用变量时自动入栈的变量值
+					thread.pop()
+
+					let value = thread.pop()
+					if (context == SESSION_LOCALS) {
+						// 如果是局部变量赋值
+						thread.setLocalVar(a, value)
+					} else if (context == SESSION_ENV_LOCALS) {
+						// 如果是环境变量赋值
+						throw new Error("env local is immutable")
+					} else {
+						// 如果是成员变量赋值
+						context[a.name] = value
+					}
+				}, "setlocal", a, v]
+			}
 		}
 
 		/**
@@ -133,7 +156,7 @@ namespace runtime {
 					// 值压栈
 					thread.push(value)
 					// 索引对象压栈
-					thread.push(SESSION_LOCALS)
+					thread.push(a)
 				}, "getLocal", a]
 			} else {
 				this.runtimeWaver.seekEnvVar(a)
@@ -143,7 +166,7 @@ namespace runtime {
 					// 值压栈
 					thread.push(value)
 					// 索引对象压栈
-					thread.push(SESSION_ENV_LOCALS)
+					thread.push(a)
 				}, "getLocal", a]
 			}
 		}
@@ -153,6 +176,7 @@ namespace runtime {
 		 * @param a 
 		 */
 		indexVarMember(a: VarID): JITInstruction {
+			this.runtimeWaver.isGoonIndexMember = true
 			return [function (thread: RuntimeThread) {
 				/**成员索引目标 */
 				thread.pop()
@@ -160,8 +184,9 @@ namespace runtime {
 				let value = thread.pop()
 				let memberValue = value[a.name]
 				thread.push(memberValue)
+				a.indexSource = value
 				// 索引对象压栈
-				thread.push(value)
+				thread.push(a)
 			}, "index"]
 		}
 
@@ -169,6 +194,7 @@ namespace runtime {
 		 * 变量作为值引用
 		 */
 		referVarAsValue(a: VarID): JITInstruction {
+			this.runtimeWaver.isGoonIndexMember = false
 			return [function (thread: RuntimeThread) {
 				thread.pop()
 			}, "referasvalue"]
