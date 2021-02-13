@@ -69,6 +69,7 @@ namespace runtime {
 			this.localIdAcc = 1
 			this.localEnvSession = new SessionWaver()
 			this.isGoonIndexMember = false
+			this.comments.length = 0
 		}
 
 		/**
@@ -84,6 +85,7 @@ namespace runtime {
 			runtimeWaver.localIdAcc = this.localIdAcc
 			runtimeWaver.localEnvSession = this.localEnvSession
 			runtimeWaver.isGoonIndexMember = this.isGoonIndexMember
+			runtimeWaver.comments = this.comments.concat()
 			return runtimeWaver
 		}
 
@@ -92,6 +94,27 @@ namespace runtime {
 		 */
 		genLocalId() {
 			return this.localIdAcc++
+		}
+
+		/**
+		 * 注释列表, 目前仅供测试用
+		 */
+		protected comments: string[] = []
+
+		/**
+		 * 捕获行注释
+		 * @param p 
+		 */
+		captureLineComment(a: VarID) {
+			this.comments.push(a.expression)
+		}
+
+		/**
+		 * 捕获块注释
+		 * @param p 
+		 */
+		captureBlockComment(a: VarID) {
+			this.comments.push(a.expression)
 		}
 
 		get activeSession() {

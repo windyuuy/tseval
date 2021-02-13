@@ -19,6 +19,22 @@ namespace runtime {
 		}
 
 		/**
+		 * 捕获行注释
+		 * @param p 
+		 */
+		captureLineComment(a: VarID) {
+			this.runtimeWaver.captureLineComment(a)
+		}
+
+		/**
+		 * 捕获块注释
+		 * @param p 
+		 */
+		captureBlockComment(a: VarID) {
+			this.runtimeWaver.captureLineComment(a)
+		}
+
+		/**
 		 * 进入新会话
 		 */
 		pushSession(): JITInstruction {

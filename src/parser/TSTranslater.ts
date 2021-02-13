@@ -52,6 +52,26 @@ namespace tseval {
 		}
 
 		/**
+		 * 捕获行注释
+		 * @param p 
+		 */
+		captureLineComment(p: pgparser.MatchedResult) {
+			this.runtimeCoder.captureLineComment({
+				expression: p.text,
+			})
+		}
+
+		/**
+		 * 捕获块注释
+		 * @param p 
+		 */
+		captureBlockComment(p: pgparser.MatchedResult) {
+			this.runtimeCoder.captureLineComment({
+				expression: p.text,
+			})
+		}
+
+		/**
 		 * 进入新会话边界
 		 * @param p 
 		 */

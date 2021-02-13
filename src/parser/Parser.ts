@@ -74,8 +74,22 @@ namespace tseval {
 		let Const_s = sequence([Const, White]).named("Const_s")
 		let LetDeclare = union([Let, Const]).named("LetDeclare")
 		let LetDeclare_s = sequence([LetDeclare, White]).named("LetDeclare_s")
+		/**导出词缀 */
 		let Export = exactly("export").named("Export")
+		/**导出词缀 */
 		let Export_s = sequence([Export, White]).named("Export_s")
+		/**块注释头 */
+		let BlockCommentBegin = exactly(/\/\*/).named("BlockCommentBegin")
+		/**块注释尾 */
+		let BlockCommentEnd = exactly(/\*\//).named("BlockCommentEnd")
+		/**块注释 */
+		let BlockComment = sequence([BlockCommentBegin, repeat(not(BlockCommentEnd)), BlockCommentEnd]).named("BlockComment")
+		BlockComment.sf(tr.captureBlockComment)
+		/**行注释头 */
+		let LineCommentHead = exactly(/\/\//).named("LineCommentHead")
+		/**行注释 */
+		let LineComment = sequence([LineCommentHead, repeat(not(LineSeperator)), LineSeperator.unconsume()]).named("LineComment")
+		LineComment.sf(tr.captureLineComment)
 		/**局部声明表达式 */
 		let DeclareLocalVarStatement = sequence([LetDeclare_s, VarName.wf(tr.declareLocalVar), $White,]).named("DeclareLocalVarStatement")
 		/**赋值操作符: = */
@@ -88,7 +102,9 @@ namespace tseval {
 		let ReferValue = union([ConstNumber, ConstString, VarRefer.wf(tr.referVarAsValue)]).named("ReferValue")
 		/**值表达式 */
 		let ValueStatement = stand().named("ValueStatement")
+		/**使用小括号联结的值 */
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
+		/**剔除了操作符算式的值表达式 */
 		let SimpleValue = stand().named("SimpleValue")
 		//#region 操作符表达式
 		/**
@@ -145,7 +161,14 @@ namespace tseval {
 				.reverseSubSignals()
 		})();
 		/**语句 */
-		let Sentence = union([ExportAndDeclareStatement, ExportStatement, DeclareAndAssignLocalVarStatement, AssignVarStatement,]).named("Sentence")
+		let Sentence = union([
+			LineComment,
+			BlockComment,
+			ExportAndDeclareStatement,
+			ExportStatement,
+			DeclareAndAssignLocalVarStatement,
+			AssignVarStatement,
+		]).named("Sentence")
 		/**会话块 */
 		let Chunk = stand().named("Chunk")
 		Chunk.assign(sequence([
