@@ -2,7 +2,7 @@
 /// <reference path="./TSTranslater.ts" />
 
 namespace tseval {
-	const { exactly, sequence, union, repeat, wrap, not, docend, stand, } = pgparser.MatcherFactory
+	const { exactly, sequence, union, repeat, wrap, not, docend, stand, maybe, } = pgparser.MatcherFactory
 	namespace parser {
 		function combine(a: Function, b: Function, c?: Function) {
 			return function (...args: any[]) {
@@ -24,9 +24,13 @@ namespace tseval {
 		/**标记文档末尾 */
 		let DocEnd = docend().named("DocEnd")
 		let Any = exactly("").named("Any")
+		/**符号 ( */
 		let BracketL = exactly("(").named("BracketL")
+		/**符号 ) */
 		let BracketR = exactly(")").named("BracketR")
+		/**符号 { */
 		let BraceL = exactly("{").named("BraceL")
+		/**符号 } */
 		let BraceR = exactly("}").named("BraceR")
 
 		/**
@@ -49,6 +53,8 @@ namespace tseval {
 		let $White = exactly(/\s*/).named("$White")
 		/**分号 */
 		let Semicolon = exactly(";").named("Semicolon")
+		/**逗号 */
+		let Comma = exactly(",").named("Comma")
 		/**行分隔符号 */
 		let LineSeperator = exactly(/\n/).named("LineSeperator")
 		/**语句分隔符 */
@@ -78,6 +84,16 @@ namespace tseval {
 		let Export = exactly("export").named("Export")
 		/**导出词缀 */
 		let Export_s = sequence([Export, White]).named("Export_s")
+
+		let FuncParamDefBegin = exactly(/\|/).named("FuncParamDefBegin")
+		let FuncParamDefEnd = exactly(/\|/).named("FuncParamDefEnd")
+		/**函数参数定义 */
+		let FuncParamDef = sequence([FuncParamDefBegin, maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])), FuncParamDefEnd,])
+		/**函数体会话块定义 */
+		let FuncBodyChunk = stand().named("FuncBodyChunk")
+		/**函数体定义 */
+		let FuncBodyDef = sequence([BraceL, FuncParamDef, maybe(FuncBodyChunk), BraceR])
+
 		/**块注释头 */
 		let BlockCommentBegin = exactly(/\/\*/).named("BlockCommentBegin")
 		/**块注释尾 */
@@ -137,7 +153,7 @@ namespace tseval {
 		let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
 		// 递归声明
-		ValueStatement.assign(union([CombinedValue, OpStatement, ReferValue,]))
+		ValueStatement.assign(union([CombinedValue, FuncBodyDef, OpStatement, ReferValue,]))
 		// 需要从中剔除操作符表达式, 避免无限递归
 		SimpleValue.assign((ValueStatement.raw as pgparser.UnionMatcher).clone().sub([OpStatement]))
 		/**
@@ -171,17 +187,23 @@ namespace tseval {
 		]).named("Sentence")
 		/**会话块 */
 		let Chunk = stand().named("Chunk")
+		let ChunkContent = repeat(sequence([$White, union([
+			sequence([Chunk, union([DocEnd, Semicolon, $White,])]),
+			sequence([Sentence, union([DocEnd, Semicolon, LineSeperator,])]),
+		]),])).timesMin(1).named("ChunkContent")
 		Chunk.assign(sequence([
 			BraceL.wf(tr.enterSession),
-			repeat(sequence([$White, union([Chunk, Sentence]), union([DocEnd, Semicolon, $White,]),])).timesMin(1).named("MutiSentence"),
+			maybe(ChunkContent),
 			BraceR.wf(tr.leaveSession)
 		]))
 		/**文档级会话块 */
 		let DocChunk = sequence([
 			Any.wf(tr.enterSession),
-			repeat(sequence([$White, union([Chunk, Sentence]), union([DocEnd, Semicolon, $White]),])).timesMin(1).named("MutiSentence"),
+			ChunkContent,
 			Any.wf(tr.leaveSession)
 		]).named("DocChunk")
+		// 函数体块形似文档级会话块
+		FuncBodyChunk.assign(ChunkContent)
 		/**文档 */
 		let Document = sequence([$White, repeat(DocChunk), $White, DocEnd]).named("Document")
 

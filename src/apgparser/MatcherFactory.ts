@@ -88,6 +88,18 @@ namespace pgparser {
 			return new InvalidConsumer().init(matchedSignal)
 		}
 
+		/**
+		 * 限制0~1次匹配
+		 * @param matchedSignal 
+		 */
+		maybe(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
+			return new MaybeConsumer().init(subMatcher, matchedSignal)
+		}
+
+		/**
+		 * 匹配文档末尾
+		 * @param matchedSignal 
+		 */
 		docend(matchedSignal: MatchedSignalPulse = null) {
 			return new DocEndConsumer().init(matchedSignal)
 		}
