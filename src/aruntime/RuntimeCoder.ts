@@ -55,6 +55,19 @@ namespace runtime {
 		}
 
 		/**
+		 * 调用函数
+		 * @param a 
+		 */
+		callFunction(a: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				// 索引值出栈
+				let func = thread.pop()
+				let value = func()
+				thread.push(value)
+			}, "callfunc"]
+		}
+
+		/**
 		 * 导入局部常量
 		 * @param a?
 		 * @param value 
@@ -226,7 +239,7 @@ namespace runtime {
 			return [function (thread: RuntimeThread) {
 				let value = thread.pop()
 				thread.setExport(a, value)
-			}, "exportvar", a]
+			}, "exportnewvar", a]
 		}
 
 		/**

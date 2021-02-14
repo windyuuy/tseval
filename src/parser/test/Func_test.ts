@@ -15,4 +15,15 @@ namespace tseval {
 		// assert(result.default == valueA, "unmatch result")
 	})
 
+	autotest.addFunc("test call function", () => {
+		let valueA = 23
+
+		let tseval = new TSEval()
+		let statement = `export let default=aaa()`
+		let result = tseval.execute<{ default: number }>(statement, {
+			aaa: function () { return valueA },
+		})
+		assert(result.default == valueA, "unmatch result")
+	})
+
 }

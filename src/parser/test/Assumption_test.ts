@@ -14,12 +14,26 @@ namespace tseval {
 		})
 	})
 
-	autotest.addFunc("summary", () => {
+	autotest.addFunc("summary 1", () => {
 		let tseval = new TSEval()
 		let statement = "123+3245-34*34*99/5455"
 		let result = tseval.execute<{ default: number }>(`
 	export let default= ${statement}
 	`)
+		assert(result.default == eval(statement), "unmatch result")
+	})
+
+	autotest.addFunc("summary 2", () => {
+		let tseval = new TSEval()
+		let statement = "123*23/2*4+3245-34*34*99/5455;"
+		let result = tseval.execute<{ default: number }>(`export let default= ${statement}`)
+		assert(result.default == eval(statement), "unmatch result")
+	})
+
+	autotest.addFunc("summary 3", () => {
+		let tseval = new TSEval()
+		let statement = "123*23*(234+43*(234/55)*645)/2*4+3245-34*(43+34-34*(43/234))*34*99/5455;"
+		let result = tseval.execute<{ default: number }>(`export let default= ${statement}`)
 		assert(result.default == eval(statement), "unmatch result")
 	})
 
@@ -100,8 +114,7 @@ namespace tseval {
 	})
 
 	autotest.addFunc("test bracket in calcstatement", () => {
-		// let statement = "2+3*(4+5/(6-7*(9-1)))"
-		let statement = "4*(2/(3-7*(9-1)))"
+		let statement = "2+3*(4+5/(6-7*(9-1)))"
 		let content = `export let default=${statement}`
 		let tseval = new TSEval()
 		let result = tseval.execute<{ default: number }>(content)

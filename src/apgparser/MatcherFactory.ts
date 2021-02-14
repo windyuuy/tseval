@@ -104,6 +104,24 @@ namespace pgparser {
 		}
 
 		/**
+		 * 仅仅匹配过滤, 信号不生效
+		 * @param subMatcher 
+		 * @param matchedSignal 
+		 */
+		filter(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
+			return new FilterConsumer().init(subMatcher, matchedSignal)
+		}
+
+		/**
+		 * 仅仅匹配过滤, 信号不生效, 并且不消耗
+		 * @param subMatcher 
+		 * @param matchedSignal 
+		 */
+		predict(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
+			return new FilterConsumer().init(subMatcher, matchedSignal).unconsume()
+		}
+
+		/**
 		 * 匹配文档末尾
 		 * @param matchedSignal 
 		 */

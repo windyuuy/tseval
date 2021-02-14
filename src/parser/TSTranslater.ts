@@ -90,6 +90,18 @@ namespace tseval {
 		}
 
 		/**
+		 * 调用函数
+		 * @param p 
+		 */
+		callFunction(p: pgparser.MatchedResult) {
+			let inst = this.runtimeCoder.callFunction({
+				name: "",
+				constValue: p.text,
+			})
+			this.instructions.push(inst)
+		}
+
+		/**
 		 * 导入常量
 		 * @param p 
 		 * @param value 

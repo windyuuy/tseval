@@ -2,7 +2,7 @@
 /// <reference path="./TSTranslater.ts" />
 
 namespace tseval {
-	const { exactly, sequence, union, repeat, wrap, not, docend, stand, maybe, repeatWithSeperator, } = pgparser.MatcherFactory
+	const { exactly, sequence, union, repeat, wrap, not, docend, stand, maybe, repeatWithSeperator, predict, } = pgparser.MatcherFactory
 	namespace parser {
 		function combine(a: Function, b: Function, c?: Function) {
 			return function (...args: any[]) {
@@ -87,10 +87,11 @@ namespace tseval {
 
 		let FuncParamDefBegin = exactly(/\|/).named("FuncParamDefBegin")
 		let FuncParamDefEnd = exactly(/\|/).named("FuncParamDefEnd")
+		let Params = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
 		/**函数参数定义 */
 		let FuncParamDef = sequence([FuncParamDefBegin,
 			// maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])),
-			repeatWithSeperator(repeat(sequence([VarName, Comma,]))),
+			Params,
 			FuncParamDefEnd,])
 		/**函数体会话块定义 */
 		let FuncBodyChunk = stand().named("FuncBodyChunk")
@@ -125,40 +126,46 @@ namespace tseval {
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
 		/**剔除了操作符算式的值表达式 */
 		let SimpleValue = stand().named("SimpleValue")
+		let RecursiveValue = stand().named("RecursiveValue")
 		//#region 操作符表达式
+
+		/**调用函数时传参 */
+		let CallParams = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
+		/**函数执行后缀 */
+		let FuncCallDeco = sequence([BracketL, CallParams, BracketR,]).wf(tr.callFunction)
+
 		/**
 		 * 优先级从前往后依次升高
 		 */
 		let operationStatements: pgparser.ConsumerBase[] = []
+		let OpValue: pgparser.ConsumerBase = null
 		{
-			let lastOpStatement: pgparser.ConsumerBase = null
+			let lastValue: pgparser.ConsumerBase = SimpleValue
 			operatorLiterals.forEach((opReg, index) => {
 				let OpStatementVz2 = (() => {
 					let OpVz2 = exactly(opReg).named(`OpV${index}`)
-					let SubValue: pgparser.ConsumerBase
-					if (lastOpStatement) {
-						SubValue = union([lastOpStatement, SimpleValue])
-					} else {
-						SubValue = SimpleValue
-					}
-					let matcher = sequence([SubValue,
-						repeat(
-							sequence([$White, OpVz2.wf(tr.convOperation), $White, SubValue]).reverseSubSignals()
-						).timesMin(1)
-					]).named(`OpStatementV${index}`)
+					let repeater = repeat(
+						sequence([$White, OpVz2.wf(tr.convOperation), $White, lastValue]).reverseSubSignals()
+					)
+					let matcher = sequence([lastValue, repeater.clone().timesMin(1)]).named(`OpStatementV${index}`)
+					let newValue = sequence([lastValue, repeater,]).named(`OpStatementV${index}`)
+					lastValue = newValue
 					return matcher
 				})();
 				operationStatements.push(OpStatementVz2)
-				lastOpStatement = OpStatementVz2
 			})
+			OpValue = sequence([predict(sequence([SimpleValue, OpAll,])), lastValue,]).named("OpValue")
+			// OpValue = lastValue.named("OpValue")
 		}
 		/**操作符计算表达式 */
 		let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
-		// 递归声明
-		ValueStatement.assign(union([CombinedValue, FuncBodyDef, OpStatement, ReferValue,]))
 		// 需要从中剔除操作符表达式, 避免无限递归
-		SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
+		// SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
+		SimpleValue.assign(union([CombinedValue, FuncBodyDef, ReferValue,]))
+		RecursiveValue.assign(union([OpValue]))
+		// 递归声明
+		ValueStatement.assign(sequence([union([RecursiveValue, SimpleValue,]), repeat(union([FuncCallDeco])),]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 
@@ -171,7 +178,7 @@ namespace tseval {
 		/**局部声明并赋值表达式 */
 		let DeclareAndAssignLocalVarStatement = genLocalDeclare(tr.declareAndAssignLocalVar).named("DeclareAndAssignLocalVarStatement")
 		/**导出声明表达式 */
-		let ExportAndDeclareStatement = sequence([Export_s, genLocalDeclare(tr.exportWithDeclareVar)]).named("ExportStatement")
+		let ExportAndDeclareStatement = sequence([Export_s, genLocalDeclare(tr.exportWithDeclareVar)]).named("ExportAndDeclareStatement")
 		/**导出表达式 */
 		let ExportStatement = sequence([Export_s, VarRefer.wf(tr.referVarAsValue).wf(tr.exportVar), wrap(SentenceSeperator).unconsume()]).named("ExportStatement")
 		/**变量赋值 */
