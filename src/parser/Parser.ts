@@ -126,7 +126,8 @@ namespace tseval {
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
 		/**剔除了操作符算式的值表达式 */
 		let SimpleValue = stand().named("SimpleValue")
-		let RecursiveValue = stand().named("RecursiveValue")
+		let RecursiveValue1 = stand().named("RecursiveValue1")
+		let RecursiveValue2 = stand().named("RecursiveValue2")
 		//#region 操作符表达式
 
 		/**调用函数时传参 */
@@ -140,7 +141,7 @@ namespace tseval {
 		let operationStatements: pgparser.ConsumerBase[] = []
 		let OpValue: pgparser.ConsumerBase = null
 		{
-			let lastValue: pgparser.ConsumerBase = SimpleValue
+			let lastValue: pgparser.ConsumerBase = RecursiveValue1
 			operatorLiterals.forEach((opReg, index) => {
 				let OpStatementVz2 = (() => {
 					let OpVz2 = exactly(opReg).named(`OpV${index}`)
@@ -154,7 +155,7 @@ namespace tseval {
 				})();
 				operationStatements.push(OpStatementVz2)
 			})
-			OpValue = sequence([predict(sequence([SimpleValue, OpAll,])), lastValue,]).named("OpValue")
+			OpValue = sequence([predict(sequence([RecursiveValue1, OpAll,])), lastValue,]).named("OpValue")
 			// OpValue = lastValue.named("OpValue")
 		}
 		/**操作符计算表达式 */
@@ -163,9 +164,10 @@ namespace tseval {
 		// 需要从中剔除操作符表达式, 避免无限递归
 		// SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
 		SimpleValue.assign(union([CombinedValue, FuncBodyDef, ReferValue,]))
-		RecursiveValue.assign(union([OpValue]))
+		RecursiveValue1.assign(sequence([SimpleValue, repeat(union([FuncCallDeco])),]))
+		RecursiveValue2.assign(union([OpValue]))
 		// 递归声明
-		ValueStatement.assign(sequence([union([RecursiveValue, SimpleValue,]), repeat(union([FuncCallDeco])),]))
+		ValueStatement.assign(union([RecursiveValue2, RecursiveValue1,]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 
