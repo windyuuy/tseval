@@ -18,7 +18,7 @@ namespace pgparser {
 		 * @param subMatchers 
 		 */
 		sequence(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
-			return new SequenceMatcher().init(subMatchers, matchedSignal)
+			return new SequenceConsumer().init(subMatchers, matchedSignal)
 		}
 
 		/**
@@ -26,7 +26,7 @@ namespace pgparser {
 		 * @param subMatchers 
 		 */
 		union(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
-			return new UnionMatcher().init(subMatchers, matchedSignal)
+			return new UnionConsumer().init(subMatchers, matchedSignal)
 		}
 
 		/**
@@ -35,7 +35,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		repeat(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
-			return new RepeatMatcher().init(subMatcher, matchedSignal)
+			return new RepeatConsumer().init(subMatcher, matchedSignal)
 		}
 
 		/**
@@ -43,7 +43,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		stand(matchedSignal: MatchedSignalPulse = null) {
-			return new WrapMatcher().init(CInvalid, matchedSignal)
+			return new WrapConsumer().init(CInvalid, matchedSignal)
 		}
 
 		/**
@@ -52,7 +52,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		wrap(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
-			return new WrapMatcher().init(subMatcher, matchedSignal)
+			return new WrapConsumer().init(subMatcher, matchedSignal)
 		}
 
 		/**
@@ -61,7 +61,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		not(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
-			return new NotMatcher().init(subMatcher, matchedSignal)
+			return new NotConsumer().init(subMatcher, matchedSignal)
 		}
 
 		/**
@@ -94,6 +94,13 @@ namespace pgparser {
 		 */
 		maybe(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {
 			return new MaybeConsumer().init(subMatcher, matchedSignal)
+		}
+
+		/**
+		 * 带可选分隔符的重复匹配
+		 */
+		repeatWithSeperator(subMatcher: RepeatConsumer, matchedSignal: MatchedSignalPulse = null) {
+			return new RepeatWithSeperatorConsumer().init(subMatcher, matchedSignal)
 		}
 
 		/**

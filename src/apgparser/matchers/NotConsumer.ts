@@ -3,7 +3,7 @@ namespace pgparser {
 	/**
 	 * 包装匹配
 	 */
-	export class NotMatcher extends ConsumerBase {
+	export class NotConsumer extends ConsumerBase {
 		protected subMatcher: ConsumerBase
 
 		init(subMatcher: ConsumerBase, matchedSignal: MatchedSignalPulse = null) {

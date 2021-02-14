@@ -3,13 +3,23 @@ namespace pgparser {
 	/**
 	 * 串联匹配
 	 */
-	export class SequenceMatcher extends ConsumerBase {
+	export class SequenceConsumer extends ConsumerBase {
 		subMatchers: ConsumerBase[] = []
 
 		init(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
 			this.matchedSignal = matchedSignal
 			this.subMatchers = subMatchers
 			return this
+		}
+
+		clone(): SequenceConsumer {
+			let clone = new SequenceConsumer()
+			clone.copy(this)
+
+			clone.subMatchers.length = 0
+			clone.subMatchers.push(...this.subMatchers)
+
+			return clone
 		}
 
 		match(iter: IterContext) {
@@ -61,5 +71,16 @@ namespace pgparser {
 			this.isReverseSubSignals = true
 			return this
 		}
+
+		/**
+		 * 分配实体
+		 * @param subMatcher 
+		 */
+		assign(subMatchers: ConsumerBase[]) {
+			this.subMatchers.length = 0
+			this.subMatchers.push(...subMatchers)
+			return this
+		}
+
 	}
 }

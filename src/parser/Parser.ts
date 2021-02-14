@@ -2,7 +2,7 @@
 /// <reference path="./TSTranslater.ts" />
 
 namespace tseval {
-	const { exactly, sequence, union, repeat, wrap, not, docend, stand, maybe, } = pgparser.MatcherFactory
+	const { exactly, sequence, union, repeat, wrap, not, docend, stand, maybe, repeatWithSeperator, } = pgparser.MatcherFactory
 	namespace parser {
 		function combine(a: Function, b: Function, c?: Function) {
 			return function (...args: any[]) {
@@ -88,7 +88,10 @@ namespace tseval {
 		let FuncParamDefBegin = exactly(/\|/).named("FuncParamDefBegin")
 		let FuncParamDefEnd = exactly(/\|/).named("FuncParamDefEnd")
 		/**函数参数定义 */
-		let FuncParamDef = sequence([FuncParamDefBegin, maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])), FuncParamDefEnd,])
+		let FuncParamDef = sequence([FuncParamDefBegin,
+			// maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])),
+			repeatWithSeperator(repeat(sequence([VarName, Comma,]))),
+			FuncParamDefEnd,])
 		/**函数体会话块定义 */
 		let FuncBodyChunk = stand().named("FuncBodyChunk")
 		/**函数体定义 */
@@ -155,7 +158,7 @@ namespace tseval {
 		// 递归声明
 		ValueStatement.assign(union([CombinedValue, FuncBodyDef, OpStatement, ReferValue,]))
 		// 需要从中剔除操作符表达式, 避免无限递归
-		SimpleValue.assign((ValueStatement.raw as pgparser.UnionMatcher).clone().sub([OpStatement]))
+		SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
 		/**
 		 * 声明局部变量, 传入函数处理局部变量声明
 		 * @param call 
@@ -188,8 +191,9 @@ namespace tseval {
 		/**会话块 */
 		let Chunk = stand().named("Chunk")
 		let ChunkContent = repeat(sequence([$White, union([
-			sequence([Chunk, union([DocEnd, Semicolon, $White,])]),
-			sequence([Sentence, union([DocEnd, Semicolon, LineSeperator,])]),
+			// sequence([Chunk, union([DocEnd, Semicolon, $White,])]),
+			// sequence([Sentence, $White, union([DocEnd, Semicolon, LineSeperator, union([BraceR, BracketR]).unconsume()])]),
+			repeat(sequence([$White, union([Chunk, Sentence]), union([DocEnd, Semicolon, $White,]),])).timesMin(1).named("MutiSentence"),
 		]),])).timesMin(1).named("ChunkContent")
 		Chunk.assign(sequence([
 			BraceL.wf(tr.enterSession),

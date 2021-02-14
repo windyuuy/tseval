@@ -26,6 +26,7 @@ namespace pgparser {
 			result.rawTarget = ""
 			result.isMatched = true
 			result.loc = iter.getUnmatchedLoc()
+			result.times = 0
 			return result
 		}
 	}

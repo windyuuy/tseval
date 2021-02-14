@@ -3,13 +3,21 @@ namespace pgparser {
 	/**
 	 * 重复执行匹配(贪婪匹配)
 	 */
-	export class RepeatMatcher extends ConsumerBase {
+	export class RepeatConsumer extends ConsumerBase {
 		protected subMatcher: ConsumerBase
 
 		/**
 		 * 匹配次数限定符
+		 * [timesMin,timesMore,timesMax,]
 		 */
 		protected matchTimes: Number3 = [-Infinity, Infinity, Infinity]
+
+		/**
+		 * 获取匹配次数信息
+		 */
+		getMatchTimes(): Number3 {
+			return this.matchTimes
+		}
 
 		/**
 		 * 限定匹配次数修饰
@@ -30,6 +38,7 @@ namespace pgparser {
 		}
 		/**
 		 * 限定最大匹配次数, 实际消耗按此次数来
+		 * - 在此次数内采用贪婪匹配
 		 * @param more 
 		 */
 		timesMore(more: number) {
@@ -50,6 +59,16 @@ namespace pgparser {
 			this.matchedSignal = matchedSignal
 			this.subMatcher = subMatcher
 			return this
+		}
+
+		clone() {
+			let clone = new RepeatConsumer()
+			clone.copy(this)
+			for (let i = 0; i < this.matchTimes.length; i++) {
+				clone.matchTimes[0] = this.matchTimes[0]
+			}
+			clone.subMatcher = this.subMatcher
+			return clone
 		}
 
 		match(iter: IterContext) {

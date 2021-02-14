@@ -3,7 +3,7 @@ namespace pgparser {
 	/**
 	 * 联合匹配
 	 */
-	export class UnionMatcher extends ConsumerBase {
+	export class UnionConsumer extends ConsumerBase {
 		subMatchers: ConsumerBase[] = []
 
 		init(subMatchers: ConsumerBase[], matchedSignal: MatchedSignalPulse = null) {
@@ -31,11 +31,11 @@ namespace pgparser {
 		/**
 		 * 复制
 		 */
-		copy(it: ConsumerBase): UnionMatcher {
+		copy(it: ConsumerBase): UnionConsumer {
 			this.needConsume = it.needConsume
 			this.matchedSignal = it.matchedSignal
 			this.name = it.name
-			if (it instanceof UnionMatcher) {
+			if (it instanceof UnionConsumer) {
 				this.subMatchers = it.subMatchers.concat()
 			}
 			return this
@@ -44,8 +44,8 @@ namespace pgparser {
 		/**
 		 * 复制
 		 */
-		clone(): UnionMatcher {
-			let clone = new UnionMatcher()
+		clone(): UnionConsumer {
+			let clone = new UnionConsumer()
 			clone.copy(this)
 			return clone
 		}
@@ -54,7 +54,7 @@ namespace pgparser {
 		 * 求出差集
 		 * @param subMatchers 
 		 */
-		sub(subMatchers: ConsumerBase[]): UnionMatcher {
+		sub(subMatchers: ConsumerBase[]): UnionConsumer {
 			let selfSubMatchers = this.subMatchers
 			for (let i = selfSubMatchers.length - 1; i >= 0; i--) {
 				let matcher = selfSubMatchers[i]

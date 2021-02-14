@@ -43,7 +43,7 @@ namespace pgparser {
 		 * @param matchedSignal 
 		 */
 		wf(matchedSignal: MatchedSignalPulse) {
-			let wrap = new WrapMatcher().init(this, matchedSignal)
+			let wrap = new WrapConsumer().init(this, matchedSignal)
 			return wrap
 		}
 
