@@ -79,11 +79,17 @@ namespace pgparser {
 			// 针对可能的串联不完全匹配消耗问题, 创建副本
 			let iterCopy = iter.clone()
 
+			let subSignalsRecords: number[] = [0]
+
 			// 进行最小匹配, 必须满足最小匹配才算成功
 			for (let i = 0; i < timesMin; i++) {
 				let result = subMatcher.consume(iterCopy)
 				if (!result.isMatched) {
 					return FailedMatchResult(iter, result, this)
+				}
+				if (this.isReverseSubSignals) {
+					// 需要反转信号, 则标记反转刻度
+					subSignalsRecords.push(iterCopy.matchedSignals.length)
 				}
 			}
 
@@ -97,11 +103,16 @@ namespace pgparser {
 						break
 					} else {
 						matchedTimes += 1
+
+						if (this.isReverseSubSignals) {
+							// 需要反转信号, 则标记反转刻度
+							subSignalsRecords.push(iterCopy.matchedSignals.length)
+						}
 					}
 				}
 			}
 
-			// 限定最大匹配次数
+			// 限定最大匹配次数(仅检查项)
 			if (matchedTimes == timesMore) {
 				let timesMax = this.matchTimes[2]
 				let iterCopy2 = iterCopy.clone()
@@ -126,6 +137,20 @@ namespace pgparser {
 						return FailedMatchResult(iter, result, this)
 					}
 				}
+			}
+
+			if (this.isReverseSubSignals) {
+				// 反转信号序号
+				// let subSignals: MatchedSignal[] = []
+				// for (let i = subSignalsRecords.length - 1; i >= 1; i--) {
+				// 	let r0 = subSignalsRecords[i - 1]
+				// 	let r1 = subSignalsRecords[i]
+				// 	let subSlice = iterCopy.matchedSignals.slice(r0, r1)
+				// 	subSignals.push(...subSlice)
+				// }
+				// iterCopy.matchedSignals.length = 0
+				// iterCopy.matchedSignals.push(...subSignals)
+				iterCopy.resortSignalsByOrder(subSignalsRecords)
 			}
 
 			// 整合匹配结果

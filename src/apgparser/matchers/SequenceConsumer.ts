@@ -42,34 +42,24 @@ namespace pgparser {
 
 			if (this.isReverseSubSignals) {
 				// 反转信号序号
-				let subSignals: MatchedSignal[] = []
-				for (let i = subSignalsRecords.length - 1; i >= 1; i--) {
-					let r0 = subSignalsRecords[i - 1]
-					let r1 = subSignalsRecords[i]
-					let subSlice = iterCopy.matchedSignals.slice(r0, r1)
-					subSignals.push(...subSlice)
-				}
-				iterCopy.matchedSignals.length = 0
-				iterCopy.matchedSignals.push(...subSignals)
+				// let subSignals: MatchedSignal[] = []
+				// for (let i = subSignalsRecords.length - 1; i >= 1; i--) {
+				// 	let r0 = subSignalsRecords[i - 1]
+				// 	let r1 = subSignalsRecords[i]
+				// 	let subSlice = iterCopy.matchedSignals.slice(r0, r1)
+				// 	subSignals.push(...subSlice)
+				// }
+				// iterCopy.matchedSignals.length = 0
+				// iterCopy.matchedSignals.push(...subSignals)
+				iterCopy.resortSignalsByOrder(subSignalsRecords)
 			}
 
+			// 整合匹配结果
 			let result = new MatchedResult(iter)
 			result.isMatched = true
 			result.loc = iter.getLocByDiff(iterCopy)
 			iter.mergeSimulated(iterCopy)
 			return result
-		}
-
-		/**
-		* 反转子匹配列表传递信号的顺序
-		*/
-		protected isReverseSubSignals: boolean = false
-		/**
-		 * 反转子匹配列表传递信号的顺序
-		 */
-		reverseSubSignals() {
-			this.isReverseSubSignals = true
-			return this
 		}
 
 		/**

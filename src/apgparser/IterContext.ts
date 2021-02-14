@@ -81,6 +81,19 @@ namespace pgparser {
 		 */
 		matchedSignals: MatchedSignal[] = []
 
+		resortSignalsByOrder(subSignalsRecords: number[]) {
+			// 反转信号序号
+			let subSignals: MatchedSignal[] = []
+			for (let i = subSignalsRecords.length - 1; i >= 1; i--) {
+				let r0 = subSignalsRecords[i - 1]
+				let r1 = subSignalsRecords[i]
+				let subSlice = this.matchedSignals.slice(r0, r1)
+				subSignals.push(...subSlice)
+			}
+			this.matchedSignals.length = 0
+			this.matchedSignals.push(...subSignals)
+		}
+
 		/**
 		 * 添加信号
 		 * @param pulse 

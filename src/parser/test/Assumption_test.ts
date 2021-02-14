@@ -37,6 +37,13 @@ namespace tseval {
 		assert(result.default == eval(statement), "unmatch result")
 	})
 
+	autotest.addFunc("summary reverse", () => {
+		let tseval = new TSEval()
+		let statement = "2**3**4"
+		let result = tseval.execute<{ default: number }>(`export let default= ${statement}`)
+		assert(result.default == eval(statement), "unmatch result")
+	})
+
 	autotest.addFunc("evalline", () => {
 		let tseval = new TSEval()
 

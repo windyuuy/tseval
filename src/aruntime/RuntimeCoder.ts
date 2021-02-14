@@ -305,7 +305,8 @@ namespace runtime {
 			return [function (thread: RuntimeThread) {
 				let vb = thread.pop()
 				let va = thread.pop()
-				let vc = va ** vb
+				// let vc = va ** vb
+				let vc = vb ** va
 				thread.push(vc)
 			}, "**", a, b]
 		}

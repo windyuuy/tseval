@@ -46,6 +46,7 @@ namespace pgparser {
 		}
 		upResult.loc[0] = result.loc[0]
 		upResult.loc[1] = result.loc[1]
+		upResult.times = 0
 		return upResult
 	}
 }

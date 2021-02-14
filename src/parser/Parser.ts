@@ -38,15 +38,15 @@ namespace tseval {
 		 * - 优先级从前往后依次升高
 		 */
 		const operatorLiterals = [
-			/(?:\*\*)/,
-			/[\*\/\%]/,
-			/[\+\-]/,
-			/(?:\=\=\=)|(?:\!\=\=)/,
-			/(?:\=\=)|(?:\!\=)/,
+			{ reg: /(?:\*\*)/, reverse: true },
+			{ reg: /[\*\/\%]/, reverse: false },
+			{ reg: /[\+\-]/, reverse: false },
+			{ reg: /(?:\=\=\=)|(?:\!\=\=)/, reverse: false },
+			{ reg: /(?:\=\=)|(?:\!\=)/, reverse: false },
 		]
 
 		// 所有操作符
-		let OpAll = exactly(new RegExp(operatorLiterals.map(r => r.source).join("|"))).named("OpAll")
+		let OpAll = exactly(new RegExp(operatorLiterals.map(r => r.reg.source).join("|"))).named("OpAll")
 		/**空白符 */
 		let White = exactly(/\s/).named("White")
 		/**可空的空白符 */
@@ -138,28 +138,36 @@ namespace tseval {
 		/**
 		 * 优先级从前往后依次升高
 		 */
-		let operationStatements: pgparser.ConsumerBase[] = []
+		// let operationStatements: pgparser.ConsumerBase[] = []
 		let OpValue: pgparser.ConsumerBase = null
 		{
 			let lastValue: pgparser.ConsumerBase = RecursiveValue1
 			operatorLiterals.forEach((opReg, index) => {
 				let OpStatementVz2 = (() => {
-					let OpVz2 = exactly(opReg).named(`OpV${index}`)
-					let repeater = repeat(
-						sequence([$White, OpVz2.wf(tr.convOperation), $White, lastValue]).reverseSubSignals()
-					)
-					let matcher = sequence([lastValue, repeater.clone().timesMin(1)]).named(`OpStatementV${index}`)
-					let newValue = sequence([lastValue, repeater,]).named(`OpStatementV${index}`)
-					lastValue = newValue
-					return matcher
+					let OpVz2 = exactly(opReg.reg).named(`OpV${index}`)
+					// let matcher = sequence([lastValue, repeater.clone().timesMin(1)]).named(`OpStatementV${index}`)
+					if (opReg.reverse) {
+						let repeater = repeat(
+							sequence([$White, lastValue, $White, OpVz2.wf(tr.convOperation),])
+						).reverseSubSignals()
+						let newValue = sequence([repeater, lastValue,]).reverseSubSignals().named(`OpStatementV${index}`)
+						lastValue = newValue
+					} else {
+						let repeater = repeat(
+							sequence([$White, OpVz2.wf(tr.convOperation), $White, lastValue]).reverseSubSignals()
+						)
+						let newValue = sequence([lastValue, repeater,]).named(`OpStatementV${index}`)
+						lastValue = newValue
+					}
+					// return matcher
 				})();
-				operationStatements.push(OpStatementVz2)
+				// operationStatements.push(OpStatementVz2)
 			})
 			OpValue = sequence([predict(sequence([RecursiveValue1, OpAll,])), lastValue,]).named("OpValue")
 			// OpValue = lastValue.named("OpValue")
 		}
 		/**操作符计算表达式 */
-		let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
+		// let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
 		// 需要从中剔除操作符表达式, 避免无限递归
 		// SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))

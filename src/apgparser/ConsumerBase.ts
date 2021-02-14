@@ -21,6 +21,18 @@ namespace pgparser {
 		matchedSignal: MatchedSignalPulse
 
 		/**
+		* 反转子匹配列表传递信号的顺序
+		*/
+		protected isReverseSubSignals: boolean = false
+		/**
+		 * 反转子匹配列表传递信号的顺序
+		 */
+		reverseSubSignals() {
+			this.isReverseSubSignals = true
+			return this
+		}
+
+		/**
 		 * 设置名称
 		 * @param name 
 		 */
