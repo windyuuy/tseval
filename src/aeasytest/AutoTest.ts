@@ -39,6 +39,10 @@ namespace easytest {
 	export const AutoTest = new TAutoTest()
 
 	export class TAutoTestManager {
+		/**
+		 * 遍历测试所有指定项目
+		 * @param tests 
+		 */
 		forEachTest(tests: TAutoTest) {
 			let calls = tests.getTests()
 			let total = calls.length
@@ -63,16 +67,23 @@ namespace easytest {
 			console.log(`= run test result: <${summary}>[total: ${total}, ok: ${okCount}, failed: ${failedCount}]`)
 			console.log("===========================================================")
 		}
+
 	}
 	export const AutoTestManager = new TAutoTestManager()
 
-	setTimeout(() => {
-		try {
-			AutoTestManager.forEachTest(AutoTest)
-		} catch (e) {
-			console.error(e.name, "Error:", e.message, "\n", e.stack)
-		}
-	}, 0)
+	/**
+	 * 延迟测试所有指定项
+	 */
+	export function testDefaultWithDelay() {
+		setTimeout(() => {
+			try {
+				AutoTestManager.forEachTest(AutoTest)
+			} catch (e) {
+				console.error(e.name, "Error:", e.message, "\n", e.stack)
+			}
+		}, 0)
+
+	}
 
 	globalThis.easytest = easytest
 }
