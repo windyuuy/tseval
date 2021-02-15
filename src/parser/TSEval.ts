@@ -44,7 +44,10 @@ namespace tseval {
 			let compileResult = this.compile(content, env)
 			// 检查编译结果
 			if (!compileResult.parseResult.isMatched) {
-				throw new pgparser.TSICompileError("compile failed")
+				let result = compileResult.parseResult
+				let surroundTexts = result.getSurroundTexts()
+				let msg = `compile failed, at: [${result.loc[0]},${result.loc[1]}], text: ${surroundTexts[0]}▲▲${surroundTexts[1]}▲▲${surroundTexts[2]}, reason: "${result.reason}".`
+				throw new pgparser.TSICompileError(msg)
 			}
 			// 检查运行时构建错误
 			compileResult.checkRuntimeWaverError()

@@ -63,6 +63,17 @@ namespace pgparser {
 		// matchedText: string = null
 
 		/**
+		 * 获取附近的文本, 用于查看错误信息
+		 */
+		getSurroundTexts() {
+			return [
+				this.source.slice(this.loc[0] - 10, this.loc[0]),
+				this.source.slice(this.loc[0], this.loc[1]),
+				this.source.slice(this.loc[1], this.loc[1] + 10),
+			]
+		}
+
+		/**
 		 * 捕获内容
 		 */
 		get text(): string {

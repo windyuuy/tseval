@@ -16,6 +16,13 @@ namespace easytest {
 		}
 
 		/**
+		 * 跳过测试此项
+		 */
+		skip() {
+			this.calls.pop()
+		}
+
+		/**
 		 * 获取所有待测试项
 		 */
 		getTests() {
@@ -43,7 +50,7 @@ namespace easytest {
 					okCount += 1
 				} catch (e) {
 					failedCount += 1
-					console.error("Test Failed:", e.name, ":", e.message, e)
+					console.error("Test Failed:", e.name, ":", e.message)
 					console.error(e.stack)
 				}
 			})

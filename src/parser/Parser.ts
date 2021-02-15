@@ -23,7 +23,7 @@ namespace tseval {
 
 		/**标记文档末尾 */
 		let DocEnd = docend().named("DocEnd")
-		let Any = exactly("").named("Any")
+		let None = exactly("").named("None")
 		/**符号 ( */
 		let BracketL = exactly("(").named("BracketL")
 		/**符号 ) */
@@ -32,6 +32,10 @@ namespace tseval {
 		let BraceL = exactly("{").named("BraceL")
 		/**符号 } */
 		let BraceR = exactly("}").named("BraceR")
+		/**方括号[ */
+		let SqBracketL = exactly("[").named("SqBracketL")
+		/**方括号] */
+		let SqBracketR = exactly("]").named("SqBracketR")
 
 		/**
 		 * 操作符匹配列表
@@ -123,8 +127,12 @@ namespace tseval {
 		let Assign = sequence([exactly(/[\=]/), not(OpAll).unconsume()]).named("Assign")
 		/**成员索引 */
 		let MemberIndexer = exactly(".").named("MemberIndexer")
+		let MemberOptionalChaining = exactly("?.").named("MemberOptionalChaining")
 		/**变量索引 */
-		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(sequence([MemberIndexer, VarName.wf(tr.indexVarMember)]))]).named("VarRefer")
+		let VarRefer = sequence([VarName.wf(tr.referLocalVar), repeat(union([
+			sequence([MemberIndexer, VarName.wf(tr.indexVarMember)]).named("MemberAccess"),
+			sequence([MemberOptionalChaining, VarName.wf(tr.optionalChaining)]).named("OptionalChaining"),
+		]))]).named("VarRefer")
 		/**表达式值 */
 		let ReferValue = union([ConstNumber, ConstString, VarRefer.wf(tr.referVarAsValue)]).named("ReferValue")
 		/**值表达式 */
@@ -227,9 +235,9 @@ namespace tseval {
 		]))
 		/**文档级会话块 */
 		let DocChunk = sequence([
-			Any.wf(tr.enterSession),
+			None.wf(tr.enterSession),
 			ChunkContent,
-			Any.wf(tr.leaveSession)
+			None.wf(tr.leaveSession)
 		]).named("DocChunk")
 		// 函数体块形似文档级会话块
 		FuncBodyChunk.assign(ChunkContent)

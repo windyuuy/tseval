@@ -11,7 +11,7 @@ namespace easytest {
 	 * @param call 
 	 * @param clses 
 	 */
-	export function expect_exception(call: Function, message?: string, ...clses: (new () => any)[]) {
+	export function expect_exception(call: Function, message?: string, ...clses: (new (msg?: string) => any)[]) {
 		let over = false
 		try {
 			call()

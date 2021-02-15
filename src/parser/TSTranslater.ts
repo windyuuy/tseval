@@ -191,6 +191,17 @@ namespace tseval {
 		}
 
 		/**
+		 * 索引变量值
+		 * @param p 
+		 */
+		optionalChaining(p: pgparser.MatchedResult) {
+			let inst = this.runtimeCoder.optionalChaining({
+				name: p.text,
+			})
+			this.instructions.push(inst)
+		}
+
+		/**
 		 * 变量作为值引用
 		 */
 		referVarAsValue(p: pgparser.MatchedResult) {

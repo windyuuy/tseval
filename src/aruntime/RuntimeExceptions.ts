@@ -66,6 +66,23 @@ namespace runtime {
 	}
 
 	/**
+	 * 错误的左赋值
+	 */
+	export class InvalidLeftHandAssignmentError extends RuntimeWaverError {
+		name = "InvalidLeftHandAssignmentError"
+		protected theVar: VarID
+
+		init(v: VarID) {
+			this.theVar = v
+			return this
+		}
+
+		get message(): string {
+			return `invalid left hand assignment: <${this.theVar.name}>.`
+		}
+	}
+
+	/**
 	 * 无效局部变量引用
 	 */
 	export class InvalidLocalVarError extends RuntimeWaverError {

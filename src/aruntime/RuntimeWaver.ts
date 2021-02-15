@@ -60,6 +60,11 @@ namespace runtime {
 		 */
 		isGoonIndexMember: boolean = false
 
+		/**
+		 * 是否作为右值
+		 */
+		isRightHandValue: boolean = false
+
 		init() {
 			this.sessions = Object.create(null)
 			this.sessionIdAcc = 1
@@ -69,6 +74,7 @@ namespace runtime {
 			this.localIdAcc = 1
 			this.localEnvSession = new SessionWaver()
 			this.isGoonIndexMember = false
+			this.isRightHandValue = false
 			this.comments.length = 0
 		}
 
@@ -85,6 +91,7 @@ namespace runtime {
 			runtimeWaver.localIdAcc = this.localIdAcc
 			runtimeWaver.localEnvSession = this.localEnvSession
 			runtimeWaver.isGoonIndexMember = this.isGoonIndexMember
+			runtimeWaver.isRightHandValue = this.isRightHandValue
 			runtimeWaver.comments = this.comments.concat()
 			return runtimeWaver
 		}
@@ -152,6 +159,8 @@ namespace runtime {
 		 * @param a 
 		 */
 		declareLocalVar(a: VarID) {
+			this.isRightHandValue = false
+
 			let ses = this.activeSession
 			if (ses.locals[a.name]) {
 				let error = new DuplicatedSymbolDeclaration().init(a)

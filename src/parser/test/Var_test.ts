@@ -32,4 +32,37 @@ namespace tseval {
 		assert(thread.sessions["1"].locals[2] == 23)
 	})
 
+	autotest.addFunc("test optional chaining", () => {
+		let evalator = new TSEval()
+		let statement = `export let AAA=aaa?.bbb;export let BBB=ccc?.bbb;`
+		let result = evalator.execute<{ AAA: number, BBB: number, }>(statement, {
+			aaa: {
+				bbb: 223,
+			},
+			ccc: null,
+		})
+		assert(result.AAA == 223)
+		assert(result.BBB == undefined)
+	})
+
+	autotest.addFunc("test set optional chaining", () => {
+		easytest.expect_exception(() => {
+			let evalator = new TSEval()
+			let statement = `aaa?.bbb=234`
+			let result = evalator.execute<{ AAA: number, BBB: number, }>(statement, {
+				aaa: {
+					bbb: 223,
+				},
+			})
+		}, "", runtime.InvalidLeftHandAssignmentError)
+	})
+
+	autotest.addFunc("test invalid left hand assignment", () => {
+		easytest.expect_exception(() => {
+			let evalator = new TSEval()
+			let statement = `234=23`
+			let result = evalator.execute<{}>(statement)
+		}, "", pgparser.TSICompileError)
+	})
+
 }

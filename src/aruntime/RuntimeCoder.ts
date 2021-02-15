@@ -4,6 +4,13 @@ namespace runtime {
 
 	export const SESSION_LOCALS = { SESSION_LOCALS: "SESSION_LOCALS" }
 	export const SESSION_ENV_LOCALS = { SESSION_ENV_LOCALS: "SESSION_ENV_LOCALS" }
+	export const SESSION_INVALID_LEFTHAND_VAR = { SESSION_INVALID_RIGHTHAND_VAR: "SESSION_INVALID_RIGHTHAND_VAR" }
+	export function GetInvalidLeftHandSideVar(pa: VarID, a: VarID): VarID {
+		return {
+			name: `${pa.name}?.${a.name}`,
+			indexSource: SESSION_INVALID_LEFTHAND_VAR,
+		}
+	}
 
 	/**
 	 * 即时指令构建
@@ -127,6 +134,10 @@ namespace runtime {
 		 * @param v 
 		 */
 		assignLocalVar(a: VarID, v: VarID): JITInstruction {
+			// 检查左值赋值引用
+			if (this.runtimeWaver.isRightHandValue) {
+				this.runtimeWaver.pushError(new runtime.InvalidLeftHandAssignmentError().init(a))
+			}
 			if (this.runtimeWaver.isGoonIndexMember) {
 				this.runtimeWaver.isGoonIndexMember = false
 				return [function (thread: RuntimeThread) {
@@ -143,6 +154,9 @@ namespace runtime {
 					} else if (context == SESSION_ENV_LOCALS) {
 						// 如果是环境变量赋值
 						throw new Error("invalid member host")
+					} else if (context == SESSION_INVALID_LEFTHAND_VAR) {
+						// 无效左值引用
+						throw new Error(`invalid left-hand side in assignment: <${address.name}>`)
 					} else {
 						// 如果是成员变量赋值
 						context[address.name] = value
@@ -166,6 +180,9 @@ namespace runtime {
 					} else if (context == SESSION_ENV_LOCALS) {
 						// 如果是环境变量赋值
 						throw new Error("env local is immutable")
+					} else if (context == SESSION_INVALID_LEFTHAND_VAR) {
+						// 无效左值引用
+						throw new Error(`invalid left-hand side in assignment: <${address.name}>`)
 					} else {
 						// 如果是成员变量赋值
 						context[a.name] = value
@@ -179,6 +196,8 @@ namespace runtime {
 		 * @param a 
 		 */
 		getLocalVar(a: VarID): JITInstruction {
+			this.runtimeWaver.isGoonIndexMember = false
+			this.runtimeWaver.isRightHandValue = false
 			this.runtimeWaver.seekLocalVar(a)
 			if (this.isValidVarID(a)) {
 				return [function (thread: RuntimeThread) {
@@ -207,6 +226,7 @@ namespace runtime {
 		 */
 		indexVarMember(a: VarID): JITInstruction {
 			this.runtimeWaver.isGoonIndexMember = true
+			this.runtimeWaver.isRightHandValue = false
 			return [function (thread: RuntimeThread) {
 				/**成员索引目标 */
 				thread.pop()
@@ -221,10 +241,36 @@ namespace runtime {
 		}
 
 		/**
+		 * 可选链
+		 * @param a 
+		 */
+		optionalChaining(a: VarID): JITInstruction {
+			this.runtimeWaver.isGoonIndexMember = true
+			this.runtimeWaver.isRightHandValue = true
+			return [function (thread: RuntimeThread) {
+				/**成员索引目标 */
+				let ca = thread.pop()
+				let invalidLeftHandVar = GetInvalidLeftHandSideVar(ca, a)
+				// 索引值出栈
+				let value = thread.pop()
+				if (value == null) {
+					// 母值为null or undefined, 那么返回 undefined
+					thread.push(undefined)
+				} else {
+					let memberValue = value[a.name]
+					thread.push(memberValue)
+				}
+				// 索引对象压栈
+				thread.push(invalidLeftHandVar)
+			}, "index"]
+		}
+
+		/**
 		 * 变量作为值引用
 		 */
 		referVarAsValue(a: VarID): JITInstruction {
 			this.runtimeWaver.isGoonIndexMember = false
+			this.runtimeWaver.isRightHandValue = true
 			return [function (thread: RuntimeThread) {
 				thread.pop()
 			}, "referasvalue"]
