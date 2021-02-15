@@ -109,9 +109,6 @@ namespace pgparser {
 		handleResult(iter: IterContext, result: MatchedResult) {
 			if (result.isMatched) {
 				if (this.matchedSignal) {
-					// 需要拆分为两步, 否则会被编译成 f.bind(this), 错误执行
-					// let f = this.matchedSignal
-					// f(result)
 					iter.pushSignal(this.matchedSignal, result)
 				}
 			}

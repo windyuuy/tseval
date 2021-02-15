@@ -45,7 +45,7 @@ namespace pgparser {
 			upResult.fallMatcher = fallMatcher
 		}
 		if (progressResult) {
-			// upResult.subResults = progressResult.subResults.concat()
+			upResult.subResults = progressResult.subResults.concat()
 		}
 		upResult.loc[0] = fallResult.loc[0]
 		upResult.loc[1] = fallResult.loc[1]

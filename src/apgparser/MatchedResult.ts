@@ -117,7 +117,7 @@ namespace pgparser {
 		 * @param result 
 		 */
 		addSubResult(result: MatchedResult) {
-			// this.subResults.push(result)
+			this.subResults.push(result)
 		}
 
 	}
