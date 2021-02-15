@@ -13,16 +13,15 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
-			{
-				let result = this.subMatcher.match(iter);
-				if (result.isMatched) {
-					return FailedMatchResult(iter, result, this)
-				}
+			let subResult = this.subMatcher.match(iter);
+			if (subResult.isMatched) {
+				return FailedMatchResult(iter, this, subResult, subResult, this)
 			}
 
-			let result = new MatchedResult(iter)
+			let result = new MatchedResult(iter, this)
 			result.isMatched = true
 			result.loc = [iter.cursor, iter.cursor + 1]
+			result.addSubResult(subResult)
 			return result
 		}
 	}

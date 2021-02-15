@@ -38,11 +38,18 @@ namespace tseval {
 		 * - 优先级从前往后依次升高
 		 */
 		const operatorLiterals = [
-			{ reg: /(?:\*\*)/, reverse: true },
-			{ reg: /[\*\/\%]/, reverse: false },
-			{ reg: /[\+\-]/, reverse: false },
-			{ reg: /(?:\=\=\=)|(?:\!\=\=)/, reverse: false },
-			{ reg: /(?:\=\=)|(?:\!\=)/, reverse: false },
+			{ reverse: true, name: "", reg: /(?:\*\*)/, },
+			{ reverse: false, name: "", reg: /[\*\/\%]/, },
+			{ reverse: false, name: "", reg: /[\+\-]/, },
+			{ reverse: false, name: "", reg: /(?:\<\<)|(?:\>\>\>)|(?:\>\>)/, },
+			{ reverse: false, name: "", reg: /(?:\<\=)|(?:\<)|(?:\>\=)|(?:\>)|(?:instanceof)|(?:in)/, },
+			{ reverse: false, name: "", reg: /(?:\=\=\=)|(?:\!\=\=)|(?:\=\=)|(?:\!\=)/, },
+			{ reverse: false, name: "", reg: /(?:\&)/, },
+			{ reverse: false, name: "", reg: /(?:\^)/, },
+			{ reverse: false, name: "", reg: /(?:\|)/, },
+			{ reverse: false, name: "", reg: /(?:\&\&)/, },
+			{ reverse: false, name: "", reg: /(?:\|\|)/, },
+			{ reverse: false, name: "", reg: /(?:\?\?)/, },
 		]
 
 		// 所有操作符
@@ -131,9 +138,9 @@ namespace tseval {
 		//#region 操作符表达式
 
 		/**调用函数时传参 */
-		let CallParams = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
+		let CallParams = repeatWithSeperator(repeat(sequence([VarName, Comma,]))).named("CallParams")
 		/**函数执行后缀 */
-		let FuncCallDeco = sequence([BracketL, CallParams, BracketR,]).wf(tr.callFunction)
+		let FuncCallDeco = sequence([BracketL, CallParams, BracketR,]).sf(tr.callFunction).named("FuncCallDeco")
 
 		/**
 		 * 优先级从前往后依次升高
@@ -156,14 +163,15 @@ namespace tseval {
 						let repeater = repeat(
 							sequence([$White, OpVz2.wf(tr.convOperation), $White, lastValue]).reverseSubSignals()
 						)
-						let newValue = sequence([lastValue, repeater,]).named(`OpStatementV${index}`)
+						let newValue = sequence([lastValue, repeater.named(`OpRepeater${index}`),]).named(`OpStatementV${index}`)
 						lastValue = newValue
 					}
 					// return matcher
 				})();
 				// operationStatements.push(OpStatementVz2)
 			})
-			OpValue = sequence([predict(sequence([RecursiveValue1, OpAll,])), lastValue,]).named("OpValue")
+			let OpFilter = predict(sequence([RecursiveValue1, $White, OpAll,])).named("OpFilter")
+			OpValue = sequence([OpFilter, lastValue,]).named("OpValue")
 			// OpValue = lastValue.named("OpValue")
 		}
 		/**操作符计算表达式 */

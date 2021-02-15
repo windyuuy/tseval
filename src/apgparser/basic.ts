@@ -36,16 +36,19 @@ namespace pgparser {
 	 * 返回默认匹配失败结果
 	 * @param iter 
 	 */
-	export function FailedMatchResult(iter: IterContext, result?: MatchedResult, matcher?: IMatcher): MatchedResult {
-		let upResult = new MatchedResult(iter)
-		if (result) {
-			upResult.mergeFailure(result)
+	export function FailedMatchResult(iter: IterContext, matcher: IMatcher, progressResult: MatchedResult, fallResult?: MatchedResult, fallMatcher?: IMatcher): MatchedResult {
+		let upResult = new MatchedResult(iter, matcher)
+		if (fallResult) {
+			upResult.mergeFailure(fallResult)
 		}
-		if (matcher) {
-			upResult.fallMatcher = matcher
+		if (fallMatcher) {
+			upResult.fallMatcher = fallMatcher
 		}
-		upResult.loc[0] = result.loc[0]
-		upResult.loc[1] = result.loc[1]
+		if (progressResult) {
+			// upResult.subResults = progressResult.subResults.concat()
+		}
+		upResult.loc[0] = fallResult.loc[0]
+		upResult.loc[1] = fallResult.loc[1]
 		upResult.times = 0
 		return upResult
 	}

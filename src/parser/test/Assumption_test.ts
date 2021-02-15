@@ -214,4 +214,120 @@ namespace tseval {
 		}
 	})
 
+	autotest.addFunc("test <<, >>, <<<", () => {
+		{
+			let statement = "233<<44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233>>44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233>>>44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233<44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233<=44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233>44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233>=44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let valueA = 23
+			let valueB = { 23: 11 }
+			let statement = "aaa in mapp"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content, {
+				aaa: valueA,
+				mapp: valueB,
+			})
+			assert(result.default == (valueA in valueB), "unmatch result")
+		}
+		{
+			let statement = "aaa instanceof Object"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: boolean }>(content, {
+				aaa: {},
+				Object: Object,
+			})
+			assert(result.default == ({} instanceof Object), "unmatch result")
+		}
+		{
+			let statement = "233&44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233^44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233|44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233&&44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233||44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+		{
+			let statement = "233??44"
+			let content = `export let default=${statement};`
+			let tseval = new TSEval()
+			let result = tseval.execute<{ default: number }>(content)
+			assert(result.default == eval(statement), "unmatch result")
+		}
+	})
+
 }

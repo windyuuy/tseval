@@ -30,7 +30,7 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
-			let result = new MatchedResult(iter);
+			let result = new MatchedResult(iter, this);
 
 			if (this.word != null) {
 				let text = iter.slice(this.word.length)

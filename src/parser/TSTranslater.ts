@@ -310,6 +310,96 @@ namespace tseval {
 					break
 				}
 
+				case "<<": {
+					let inst = this.runtimeCoder.opBitwiseLeftShift(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case ">>": {
+					let inst = this.runtimeCoder.opBitwiseRightShift(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case ">>>": {
+					let inst = this.runtimeCoder.opBitwiseUnsignedRightShift(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "<": {
+					let inst = this.runtimeCoder.opLessThan(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "<=": {
+					let inst = this.runtimeCoder.opLessThanOrEqual(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case ">": {
+					let inst = this.runtimeCoder.opGreaterThan(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case ">=": {
+					let inst = this.runtimeCoder.opGreaterThanOrEqual(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "in": {
+					let inst = this.runtimeCoder.opIn(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "instanceof": {
+					let inst = this.runtimeCoder.opInstanceof(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "&": {
+					let inst = this.runtimeCoder.opBitwiseAND(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "^": {
+					let inst = this.runtimeCoder.opBitwiseXOR(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "|": {
+					let inst = this.runtimeCoder.opBitwiseOR(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "&&": {
+					let inst = this.runtimeCoder.opLogicalAND(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "||": {
+					let inst = this.runtimeCoder.opLogicalOR(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
+				case "??": {
+					let inst = this.runtimeCoder.opNullishCoalescingOperator(p1, p2)
+					this.instructions.push(inst)
+					break
+				}
+
 				default: {
 					this.runtimeWaver.pushError(new runtime.InvalidSymbolError().init({
 						name: p.text,

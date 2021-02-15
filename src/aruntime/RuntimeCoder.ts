@@ -343,6 +343,126 @@ namespace runtime {
 				thread.push(vc)
 			}, "", a, b]
 		}
+		opBitwiseLeftShift(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va << vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opBitwiseRightShift(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va >> vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opBitwiseUnsignedRightShift(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va >>> vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opLessThan(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va < vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opLessThanOrEqual(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va <= vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opGreaterThan(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va > vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opGreaterThanOrEqual(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va >= vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opIn(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = (va in vb)
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opInstanceof(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = (va instanceof vb)
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opBitwiseAND(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va & vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opBitwiseXOR(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va ^ vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opBitwiseOR(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va | vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opLogicalAND(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va && vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opLogicalOR(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va || vb
+				thread.push(vc)
+			}, "", a, b]
+		}
+		opNullishCoalescingOperator(a: VarID, b: VarID): JITInstruction {
+			return [function (thread: RuntimeThread) {
+				let vb = thread.pop()
+				let va = thread.pop()
+				let vc = va ?? vb
+				thread.push(vc)
+			}, "", a, b]
+		}
 
 		//#endregion
 

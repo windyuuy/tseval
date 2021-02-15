@@ -37,9 +37,20 @@ namespace pgparser {
 		rawTarget: any
 
 		/**
+		 * 匹配器
+		 */
+		matcher: IMatcher = null
+
+		/**
 		 * 失败的匹配器
 		 */
 		fallMatcher: IMatcher = null
+
+		/**
+		 * 匹配子列表
+		 * - 仅调试用, 支持查看匹配明细
+		 */
+		subResults: MatchedResult[] = []
 
 		/**
 		 * 子结果树
@@ -79,13 +90,14 @@ namespace pgparser {
 			return this.loc[1] - this.loc[0]
 		}
 
-		constructor(iter: IterContext) {
-			this.init(iter)
+		constructor(iter: IterContext, matcher: IMatcher) {
+			this.init(iter, matcher)
 		}
 
-		init(iter: IterContext) {
+		init(iter: IterContext, matcher: IMatcher) {
 			this.loc = [iter.cursor, iter.cursor]
 			this.source = iter.source
+			this.matcher = matcher
 			return this
 		}
 
@@ -97,6 +109,15 @@ namespace pgparser {
 			this.reason = source.reason
 			this.rawTarget = source.rawTarget
 			this.fallMatcher = source.fallMatcher
+		}
+
+		/**
+		 * 添加子结果
+		 * - 供调试观测用
+		 * @param result 
+		 */
+		addSubResult(result: MatchedResult) {
+			// this.subResults.push(result)
 		}
 
 	}

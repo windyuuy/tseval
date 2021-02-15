@@ -23,6 +23,7 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
+			let finalResult = new MatchedResult(iter, this)
 			/**
 			 * 由于不确定是否全部匹配, 所以需要创建副本, 避免串联不完全匹配导致的消耗
 			 */
@@ -32,8 +33,9 @@ namespace pgparser {
 			for (let subMatcher of this.subMatchers) {
 				let result = subMatcher.consume(iterCopy)
 				if (!result.isMatched) {
-					return FailedMatchResult(iter, result, subMatcher)
+					return FailedMatchResult(iter, this, finalResult, result, subMatcher)
 				}
+				finalResult.addSubResult(result)
 				if (this.isReverseSubSignals) {
 					// 需要反转信号, 则标记反转刻度
 					subSignalsRecords.push(iterCopy.matchedSignals.length)
@@ -55,11 +57,10 @@ namespace pgparser {
 			}
 
 			// 整合匹配结果
-			let result = new MatchedResult(iter)
-			result.isMatched = true
-			result.loc = iter.getLocByDiff(iterCopy)
+			finalResult.isMatched = true
+			finalResult.loc = iter.getLocByDiff(iterCopy)
 			iter.mergeSimulated(iterCopy)
-			return result
+			return finalResult
 		}
 
 		/**

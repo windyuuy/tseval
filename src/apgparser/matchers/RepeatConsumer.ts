@@ -72,6 +72,8 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
+			let finalResult = new MatchedResult(iter, this)
+
 			let timesMin = this.matchTimes[0]
 			timesMin = Math.max(timesMin, 0)
 
@@ -85,8 +87,9 @@ namespace pgparser {
 			for (let i = 0; i < timesMin; i++) {
 				let result = subMatcher.consume(iterCopy)
 				if (!result.isMatched) {
-					return FailedMatchResult(iter, result, this)
+					return FailedMatchResult(iter, this, finalResult, result, this)
 				}
+				finalResult.addSubResult(result)
 				if (this.isReverseSubSignals) {
 					// 需要反转信号, 则标记反转刻度
 					subSignalsRecords.push(iterCopy.matchedSignals.length)
@@ -104,6 +107,7 @@ namespace pgparser {
 					} else {
 						matchedTimes += 1
 
+						finalResult.addSubResult(result)
 						if (this.isReverseSubSignals) {
 							// 需要反转信号, 则标记反转刻度
 							subSignalsRecords.push(iterCopy.matchedSignals.length)
@@ -134,7 +138,7 @@ namespace pgparser {
 					let result = subMatcher.match(iterCopy2)
 					if (result.isMatched) {
 						// 超过max, 失败
-						return FailedMatchResult(iter, result, this)
+						return FailedMatchResult(iter, this, finalResult, result, this)
 					}
 				}
 			}
@@ -154,12 +158,11 @@ namespace pgparser {
 			}
 
 			// 整合匹配结果
-			let result = new MatchedResult(iter)
-			result.times = matchedTimes
-			result.isMatched = true
-			result.loc = iter.getLocByDiff(iterCopy)
+			finalResult.times = matchedTimes
+			finalResult.isMatched = true
+			finalResult.loc = iter.getLocByDiff(iterCopy)
 			iter.mergeSimulated(iterCopy)
-			return result
+			return finalResult
 		}
 	}
 }

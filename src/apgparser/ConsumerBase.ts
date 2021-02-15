@@ -133,7 +133,7 @@ namespace pgparser {
 		 * @param iter 
 		 */
 		match(iter: IterContext): MatchedResult {
-			return FailedMatchResult(iter)
+			return FailedMatchResult(iter, this, null)
 		}
 	}
 

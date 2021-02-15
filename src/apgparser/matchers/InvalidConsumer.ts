@@ -11,7 +11,7 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
-			let result = new MatchedResult(iter);
+			let result = new MatchedResult(iter, this);
 
 			result.rawTarget = ""
 			result.isMatched = false

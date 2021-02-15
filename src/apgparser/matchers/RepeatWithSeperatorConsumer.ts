@@ -46,11 +46,12 @@ namespace pgparser {
 				if (times <= timesMore - 1 && times < timesMax) {
 					// 仅差一次匹配, 那么尝试无分隔符匹配
 					let subSequence = this.subSequence
-					let endResult = subSequence.consume(iterCopy)
+					var endResult = subSequence.consume(iterCopy)
 					if (endResult.isMatched) {
 						times += 1
 						result.times += 1
 						result.loc[1] = endResult.loc[1]
+						result.addSubResult(endResult)
 					}
 				}
 
@@ -59,7 +60,7 @@ namespace pgparser {
 					return result
 				}
 			}
-			return FailedMatchResult(iter)
+			return FailedMatchResult(iter, this, result, endResult ?? result)
 		}
 
 	}

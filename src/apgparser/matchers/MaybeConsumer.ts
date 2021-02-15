@@ -13,20 +13,19 @@ namespace pgparser {
 		}
 
 		match(iter: IterContext) {
-			{
-				let result = this.subMatcher.match(iter);
-				if (result.isMatched) {
-					// 匹配到一次, 则返回成功
-					return result
-				}
+			let subResult = this.subMatcher.match(iter);
+			if (subResult.isMatched) {
+				// 匹配到一次, 则返回成功
+				return subResult
 			}
 
 			// 未匹配到则返回空匹配成功
-			let result = new MatchedResult(iter);
+			let result = new MatchedResult(iter, this);
 			result.rawTarget = ""
 			result.isMatched = true
 			result.loc = iter.getUnmatchedLoc()
 			result.times = 0
+			result.addSubResult(subResult)
 			return result
 		}
 	}

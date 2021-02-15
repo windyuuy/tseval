@@ -65,7 +65,7 @@ namespace easytest {
 		} catch (e) {
 			console.error(e.name, "Error:", e.message, "\n", e.stack)
 		}
-	}, 0)
+	}, 4000)
 
 	globalThis.easytest = easytest
 }
