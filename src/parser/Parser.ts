@@ -35,7 +35,7 @@ namespace tseval {
 
 		/**
 		 * 操作符匹配列表
-		 * - 优先级从前往后依次升高
+		 * - 优先级从前往后依次降低
 		 */
 		const operatorLiterals = [
 			{ reverse: true, name: "", reg: /(?:\*\*)/, },
@@ -143,7 +143,7 @@ namespace tseval {
 		let FuncCallDeco = sequence([BracketL, CallParams, BracketR,]).sf(tr.callFunction).named("FuncCallDeco")
 
 		/**
-		 * 优先级从前往后依次升高
+		 * 优先级从前往后依次降低
 		 */
 		// let operationStatements: pgparser.ConsumerBase[] = []
 		let OpValue: pgparser.ConsumerBase = null
