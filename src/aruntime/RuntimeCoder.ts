@@ -363,7 +363,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va == vb
 				thread.push(vc)
-			}, "", p1, p2]
+			}, "==", p1, p2]
 		}
 		notEqual(p1: VarID, p2: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -371,7 +371,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va != vb
 				thread.push(vc)
-			}, "", p1, p2]
+			}, "!=", p1, p2]
 		}
 		strictEqual(p1: VarID, p2: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -379,7 +379,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va === vb
 				thread.push(vc)
-			}, "", p1, p2]
+			}, "===", p1, p2]
 		}
 		strictNotEqual(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -387,7 +387,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va !== vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "!==", a, b]
 		}
 		opBitwiseLeftShift(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -395,7 +395,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va << vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "<<", a, b]
 		}
 		opBitwiseRightShift(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -403,7 +403,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va >> vb
 				thread.push(vc)
-			}, "", a, b]
+			}, ">>", a, b]
 		}
 		opBitwiseUnsignedRightShift(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -411,7 +411,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va >>> vb
 				thread.push(vc)
-			}, "", a, b]
+			}, ">>>", a, b]
 		}
 		opLessThan(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -419,7 +419,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va < vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "<", a, b]
 		}
 		opLessThanOrEqual(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -435,7 +435,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va > vb
 				thread.push(vc)
-			}, "", a, b]
+			}, ">", a, b]
 		}
 		opGreaterThanOrEqual(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -443,7 +443,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va >= vb
 				thread.push(vc)
-			}, "", a, b]
+			}, ">=", a, b]
 		}
 		opIn(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -451,7 +451,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = (va in vb)
 				thread.push(vc)
-			}, "", a, b]
+			}, "in", a, b]
 		}
 		opInstanceof(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -459,7 +459,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = (va instanceof vb)
 				thread.push(vc)
-			}, "", a, b]
+			}, "instanceof", a, b]
 		}
 		opBitwiseAND(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -467,7 +467,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va & vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "&", a, b]
 		}
 		opBitwiseXOR(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -475,7 +475,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va ^ vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "^", a, b]
 		}
 		opBitwiseOR(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -483,7 +483,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va | vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "|", a, b]
 		}
 		opLogicalAND(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -491,7 +491,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va && vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "&&", a, b]
 		}
 		opLogicalOR(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -499,7 +499,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va || vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "||", a, b]
 		}
 		opNullishCoalescingOperator(a: VarID, b: VarID): JITInstruction {
 			return [function (thread: RuntimeThread) {
@@ -507,7 +507,7 @@ namespace runtime {
 				let va = thread.pop()
 				let vc = va ?? vb
 				thread.push(vc)
-			}, "", a, b]
+			}, "??", a, b]
 		}
 
 		//#endregion

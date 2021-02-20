@@ -141,7 +141,9 @@ namespace tseval {
 		let CombinedValue = sequence([BracketL, ValueStatement, BracketR]).named("CombinedValue")
 		/**剔除了操作符算式的值表达式 */
 		let SimpleValue = stand().named("SimpleValue")
+		/**右递归表达式 */
 		let RecursiveValue1 = stand().named("RecursiveValue1")
+		/**双边递归表达式 */
 		let RecursiveValue2 = stand().named("RecursiveValue2")
 		//#region 操作符表达式
 

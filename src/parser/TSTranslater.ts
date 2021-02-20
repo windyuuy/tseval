@@ -95,7 +95,7 @@ namespace tseval {
 		 */
 		callFunction(p: pgparser.MatchedResult) {
 			let inst = this.runtimeCoder.callFunction({
-				name: "",
+				name: `call_${p.text}`,
 				constValue: p.text,
 			})
 			this.instructions.push(inst)
