@@ -1,7 +1,7 @@
 {
     "name": "tseval",
     "version": "1.0.0",
-    "main": "dist/index.js",
+    "main": "index.js",
     "repository": "https://github.com/windyuuy/tseval.git",
     "author": "windy <kugoo11v12@126.com>",
     "license": "MIT"
