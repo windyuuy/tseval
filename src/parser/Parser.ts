@@ -36,6 +36,12 @@ namespace tseval {
 		let SqBracketL = exactly("[").named("SqBracketL")
 		/**方括号] */
 		let SqBracketR = exactly("]").named("SqBracketR")
+		/**胖括号 */
+		let FatArrow = exactly("=>").named("FatArrow")
+		/**窄括号 */
+		let NarrowArrow = exactly("->").named("NarrowArrow")
+		/**函数声明前缀 */
+		let FuncPrefix = exactly("function").named("FuncPrefix")
 
 		/**
 		 * 操作符匹配列表
@@ -96,8 +102,8 @@ namespace tseval {
 		/**导出词缀 */
 		let Export_s = sequence([Export, White]).named("Export_s")
 
-		let FuncParamDefBegin = exactly(/\|/).named("FuncParamDefBegin")
-		let FuncParamDefEnd = exactly(/\|/).named("FuncParamDefEnd")
+		let FuncParamDefBegin = exactly(/\(/).named("FuncParamDefBegin")
+		let FuncParamDefEnd = exactly(/\)/).named("FuncParamDefEnd")
 		let Params = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
 		/**函数参数定义 */
 		let FuncParamDef = sequence([FuncParamDefBegin,
@@ -106,8 +112,10 @@ namespace tseval {
 			FuncParamDefEnd,])
 		/**函数体会话块定义 */
 		let FuncBodyChunk = stand().named("FuncBodyChunk")
-		/**函数体定义 */
-		let FuncBodyDef = sequence([BraceL, FuncParamDef, maybe(FuncBodyChunk), BraceR])
+		/**lambda函数体定义 */
+		let LambdaBodyDef = sequence([FuncParamDef, FatArrow, BraceL, maybe(FuncBodyChunk), BraceR])
+		/**函数定义 */
+		let FuncBodyDef = sequence([FuncPrefix, FuncParamDef, BraceL, maybe(FuncBodyChunk), BraceR])
 
 		/**块注释头 */
 		let BlockCommentBegin = exactly(/\/\*/).named("BlockCommentBegin")
@@ -192,7 +200,7 @@ namespace tseval {
 		//#endregion
 		// 需要从中剔除操作符表达式, 避免无限递归
 		// SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
-		SimpleValue.assign(union([CombinedValue, FuncBodyDef, ReferValue,]))
+		SimpleValue.assign(union([CombinedValue, FuncBodyDef, LambdaBodyDef, ReferValue,]))
 		RecursiveValue1.assign(sequence([SimpleValue, repeat(union([FuncCallDeco])),]))
 		RecursiveValue2.assign(union([OpValue]))
 		// 递归声明
