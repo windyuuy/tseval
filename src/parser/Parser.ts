@@ -149,7 +149,10 @@ namespace tseval {
 
 		/**调用函数时传参 */
 		let CallParams = repeatWithSeperator(repeat(sequence([VarName, Comma,]))).named("CallParams")
-		/**函数执行后缀 */
+		/**
+		 * 函数定义
+		 * - 形如: {|...params| body;}
+		 */
 		let FuncCallDeco = sequence([BracketL, CallParams, BracketR,]).sf(tr.callFunction).named("FuncCallDeco")
 
 		/**

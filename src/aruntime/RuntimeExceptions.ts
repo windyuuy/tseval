@@ -95,7 +95,7 @@ namespace runtime {
 		}
 
 		get message(): string {
-			return `local var <${this.theVar.name}> undefined.`
+			return `local var <${this.theVar.name}> is undefined.`
 		}
 	}
 
