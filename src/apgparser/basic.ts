@@ -17,6 +17,7 @@ namespace pgparser {
 	 * 匹配成功信号
 	 */
 	export type MatchedSignalPulse = (p: MatchedResult) => void
+	export type BeforeMatchSignal = () => void
 
 	/**
 	 * 匹配成功信号

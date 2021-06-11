@@ -102,21 +102,6 @@ namespace tseval {
 		/**导出词缀 */
 		let Export_s = sequence([Export, White]).named("Export_s")
 
-		let FuncParamDefBegin = exactly(/\(/).named("FuncParamDefBegin")
-		let FuncParamDefEnd = exactly(/\)/).named("FuncParamDefEnd")
-		let Params = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
-		/**函数参数定义 */
-		let FuncParamDef = sequence([FuncParamDefBegin,
-			// maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])),
-			Params,
-			FuncParamDefEnd,])
-		/**函数体会话块定义 */
-		let FuncBodyChunk = stand().named("FuncBodyChunk")
-		/**lambda函数体定义 */
-		let LambdaBodyDef = sequence([FuncParamDef, FatArrow, BraceL, maybe(FuncBodyChunk), BraceR])
-		/**函数定义 */
-		let FuncBodyDef = sequence([FuncPrefix, FuncParamDef, BraceL, maybe(FuncBodyChunk), BraceR])
-
 		/**块注释头 */
 		let BlockCommentBegin = exactly(/\/\*/).named("BlockCommentBegin")
 		/**块注释尾 */
@@ -198,10 +183,37 @@ namespace tseval {
 		/**操作符计算表达式 */
 		// let OpStatement = repeat(union(operationStatements)).timesMin(1).named("OpStatement")
 		//#endregion
+
+		let FuncParamDefBegin = exactly(/\(/).named("FuncParamDefBegin")
+		let FuncParamDefEnd = exactly(/\)/).named("FuncParamDefEnd")
+		let Params = repeatWithSeperator(repeat(sequence([VarName, Comma,])))
+		/**函数参数定义 */
+		let FuncParamDef = sequence([FuncParamDefBegin,
+			// maybe(sequence([VarName, repeat(sequence([Comma, VarName,]))])),
+			Params,
+			FuncParamDefEnd,])
+		/**函数体会话块定义 */
+		let FuncBodyChunk = stand().named("FuncBodyChunk")
+		/**()=>{xxx} */
+		let ComplexLambdaDef = sequence([FuncParamDef, FatArrow, BraceL, maybe(FuncBodyChunk), BraceR])
+		/**()=>xxx */
+		let SimpleLambdaDef = sequence([FuncParamDef, FatArrow, ValueStatement])
+		/**lambda函数体定义 */
+		let LambdaDef = union([SimpleLambdaDef, ComplexLambdaDef])
+		/**匿名函数定义 */
+		let AnonymousFuncDef = sequence([FuncPrefix, FuncParamDef, BraceL, maybe(FuncBodyChunk), BraceR])
+		/**函数名 */
+		let FuncName = wrap(Word).named("FuncName")
+		/**命名函数定义 */
+		let NamedFuncDef = sequence([FuncPrefix, White, FuncName, $White, FuncParamDef, BraceL, maybe(FuncBodyChunk), BraceR])
+		let FuncDef = union([NamedFuncDef, AnonymousFuncDef])
+		let CallableDef = union([FuncDef, LambdaDef])
+
 		// 需要从中剔除操作符表达式, 避免无限递归
 		// SimpleValue.assign((ValueStatement.raw as pgparser.UnionConsumer).clone().sub([OpStatement]))
-		SimpleValue.assign(union([CombinedValue, FuncBodyDef, LambdaBodyDef, ReferValue,]))
-		RecursiveValue1.assign(sequence([SimpleValue, repeat(union([FuncCallDeco])),]))
+		SimpleValue.assign(union([CombinedValue, CallableDef, ReferValue,]))
+		let AssignVarStatement = stand().named("AssignVarStatement")
+		RecursiveValue1.assign(union([AssignVarStatement, sequence([SimpleValue, repeat(union([FuncCallDeco])),])]))
 		RecursiveValue2.assign(union([OpValue]))
 		// 递归声明
 		ValueStatement.assign(union([RecursiveValue2, RecursiveValue1,]))
@@ -221,10 +233,11 @@ namespace tseval {
 		/**导出表达式 */
 		let ExportStatement = sequence([Export_s, VarRefer.wf(tr.referVarAsValue).wf(tr.exportVar), wrap(SentenceSeperator).unconsume()]).named("ExportStatement")
 		/**变量赋值 */
-		let AssignVarStatement = (() => {
+		AssignVarStatement.assign((() => {
 			return sequence([VarRefer.wf(tr.assignLocalVar), $White, Assign, $White, ValueStatement])
 				.reverseSubSignals()
-		})();
+		})())
+		let ValueStatementSentence = ValueStatement
 		/**语句 */
 		let Sentence = union([
 			LineComment,
@@ -233,6 +246,7 @@ namespace tseval {
 			ExportStatement,
 			DeclareAndAssignLocalVarStatement,
 			AssignVarStatement,
+			ValueStatementSentence,
 		]).named("Sentence")
 		/**会话块 */
 		let Chunk = stand().named("Chunk")

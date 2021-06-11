@@ -21,6 +21,11 @@ namespace pgparser {
 		matchedSignal: MatchedSignalPulse
 
 		/**
+		 * 预匹配信号, 主要用于调试
+		 */
+		beforeMatchSignal: BeforeMatchSignal
+
+		/**
 		* 反转子匹配列表传递信号的顺序
 		*/
 		protected isReverseSubSignals: boolean = false
